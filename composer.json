@@ -1,0 +1,17 @@
+{
+    "name": "cooking-school/booking",
+    "description": "WooCommerce extension for cooking school class booking and video courses",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "CookingSchoolBooking\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

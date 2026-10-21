@@ -1,0 +1,29 @@
+/* Cooking School Booking — WC product admin panels */
+
+[dir="rtl"] .csb-lesson-row {
+    border-radius: 4px;
+}
+
+.csb-lessons-repeater h4 {
+    font-size: 14px;
+    color: #23282d;
+    margin: 12px 0 4px;
+}
+
+.csb-lesson-row + .csb-lesson-row {
+    margin-top: 8px;
+}
+
+.csb-add-lesson {
+    margin-top: 4px !important;
+}
+
+.csb-remove-lesson {
+    margin-top: 6px !important;
+}
+
+/* Hide irrelevant WC panels for our types via JS-class toggles */
+.show_if_class,
+.show_if_video_course {
+    display: none;
+}
