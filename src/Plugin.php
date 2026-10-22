@@ -7,6 +7,7 @@
 
 namespace CookingSchoolBooking;
 
+use CookingSchoolBooking\Admin\AppearancePage;
 use CookingSchoolBooking\Admin\AttendancePage;
 use CookingSchoolBooking\Admin\BookingsPage;
 use CookingSchoolBooking\Admin\CalendarPage;
@@ -27,6 +28,7 @@ use CookingSchoolBooking\Frontend\OrderBooking;
 use CookingSchoolBooking\Frontend\Rewrites;
 use CookingSchoolBooking\Frontend\Schema;
 use CookingSchoolBooking\Frontend\SeoMeta;
+use CookingSchoolBooking\Frontend\StyleVars;
 use CookingSchoolBooking\Install\Migrator;
 use CookingSchoolBooking\Products\ProductTypes;
 use CookingSchoolBooking\Frontend\MyAccount;
@@ -195,6 +197,12 @@ final class Plugin {
 
 		// Phase 6 — REST: admin group SMS to session students.
 		( new AdminSessionController() )->init();
+
+		// Phase 8a — Appearance settings: color tokens + theme presets.
+		( new AppearancePage() )->init();
+
+		// Phase 8a — Front-end: inline :root CSS vars + enqueue csb.css.
+		( new StyleVars() )->init();
 
 		// Phase 7 — Admin: CSB coupon management.
 		( new CouponsPage() )->init();
