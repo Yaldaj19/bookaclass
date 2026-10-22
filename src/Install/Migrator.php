@@ -221,7 +221,7 @@ class Migrator {
 		$sql_otp_tokens = "CREATE TABLE {$prefix}csb_otp_tokens (
   id          BIGINT(20)   UNSIGNED NOT NULL AUTO_INCREMENT,
   phone       VARCHAR(20)  NOT NULL COMMENT 'normalised E.164 or local format',
-  code        VARCHAR(8)   NOT NULL COMMENT 'hashed OTP code',
+  code        VARCHAR(255) NOT NULL COMMENT 'hashed OTP code',
   expires_at  DATETIME     NOT NULL,
   used        TINYINT(1)   NOT NULL DEFAULT 0,
   attempts    TINYINT(3)   UNSIGNED NOT NULL DEFAULT 0 COMMENT 'wrong-guess counter (max 5)',

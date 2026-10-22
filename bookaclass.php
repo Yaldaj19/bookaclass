@@ -3,7 +3,7 @@
  * Plugin Name:       BookaClass
  * Plugin URI:        https://github.com/
  * Description:       رزرو کلاس حضوری/آنلاین زنده و فروش ویدیو کلاس روی WooCommerce — بیعانه، تسویه، کیف‌پول، پنل مدرس و سئو. جامع و حرفه‌ای.
- * Version:           0.6.0
+ * Version:           0.7.0
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Author:            Developer
@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-define( 'CSB_VERSION',    '0.6.0' );
-define( 'CSB_DB_VERSION', 5 );
+define( 'CSB_VERSION',    '0.7.0' );
+define( 'CSB_DB_VERSION', 6 );
 define( 'CSB_FILE',       __FILE__ );
 define( 'CSB_PATH',       plugin_dir_path( __FILE__ ) );
 define( 'CSB_URL',        plugin_dir_url( __FILE__ ) );

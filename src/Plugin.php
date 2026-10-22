@@ -341,9 +341,9 @@ final class Plugin {
 
 		$table = $wpdb->prefix . 'csb_bookings';
 
-		// Total revenue: sum of amount_paid for confirmed/completed bookings.
+		// Total revenue: sum of paid_amount for confirmed/completed bookings.
 		$revenue = (float) $wpdb->get_var(
-			"SELECT COALESCE(SUM(amount_paid), 0) FROM {$table}
+			"SELECT COALESCE(SUM(paid_amount), 0) FROM {$table}
 			  WHERE status IN ('confirmed','completed')"
 		);
 
