@@ -98,6 +98,11 @@ class Rewrites {
 		// ── Archive pages — registered only when has_archive is on ───────────
 		if ( ! empty( $class_cfg['has_archive'] ) ) {
 			add_rewrite_rule(
+				'^' . preg_quote( $class_base, '/' ) . '/page/([0-9]+)/?$',
+				'index.php?post_type=product&csb_product_type=class&csb_archive=1&paged=$matches[1]',
+				'top'
+			);
+			add_rewrite_rule(
 				'^' . preg_quote( $class_base, '/' ) . '/?$',
 				'index.php?post_type=product&csb_product_type=class&csb_archive=1',
 				'top'
@@ -105,6 +110,11 @@ class Rewrites {
 		}
 
 		if ( ! empty( $video_cfg['has_archive'] ) ) {
+			add_rewrite_rule(
+				'^' . preg_quote( $video_base, '/' ) . '/page/([0-9]+)/?$',
+				'index.php?post_type=product&csb_product_type=video_course&csb_archive=1&paged=$matches[1]',
+				'top'
+			);
 			add_rewrite_rule(
 				'^' . preg_quote( $video_base, '/' ) . '/?$',
 				'index.php?post_type=product&csb_product_type=video_course&csb_archive=1',
