@@ -9,6 +9,7 @@ namespace BookaClass;
 
 use BookaClass\Admin\AppearancePage;
 use BookaClass\Admin\AttendancePage;
+use BookaClass\Admin\WhiteLabel;
 use BookaClass\Admin\BookingsPage;
 use BookaClass\Admin\CalendarPage;
 use BookaClass\Admin\ContentTypesPage;
@@ -122,6 +123,9 @@ final class Plugin {
 
 		// Phase 0 — Relabel WooCommerce UI strings.
 		( new Relabel() )->init();
+
+		// Phase 0 — White-label: hide WC menus, reorder «آموزشگاه», scrub WC chrome.
+		( new WhiteLabel() )->init();
 
 		// Phase 0 — Settings: register the old option group (backward-compat) + new hub.
 		( new SettingsPage() )->init();
