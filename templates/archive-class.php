@@ -37,24 +37,20 @@ $card_cta_label  = esc_html( sanitize_text_field( $s['card_cta_label'] ?: __( '�
 $active_cat  = sanitize_title( (string) ( $_GET['csb_cat']  ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $active_type = sanitize_key(   (string) ( $_GET['csb_type'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-// All product_cat terms for filter chips.
-$archive_terms = get_terms( [
-	'taxonomy'   => 'product_cat',
-	'hide_empty' => true,
-	'exclude'    => get_term_by( 'slug', 'uncategorized', 'product_cat' ) ? get_term_by( 'slug', 'uncategorized', 'product_cat' )->term_id : 0,
-] );
-$archive_terms = is_wp_error( $archive_terms ) ? [] : $archive_terms;
+// Only product_cat terms that actually have 'class' type products.
+$archive_terms = CardData::terms_for_type( 'class' );
 
-// Current archive URL base (without filter params).
-$archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( null, 'classes/' );
+// Current archive URL base — must point to /classes/ (not the WC shop).
+$_csb_cfg_early   = \BookaClass\Products\ProductTypes::get_config();
+$_csb_class_base  = sanitize_title( $_csb_cfg_early['types']['class']['classes_base'] ?? 'classes' );
+$archive_base_url = trailingslashit( home_url( '/' . $_csb_class_base ) );
 ?>
 
 <main id="csb-archive-main" class="csb csb-main csb-archive csb-archive--<?php echo esc_attr( $archive_width ); ?>" dir="rtl">
 
 	<?php
 	// ── Breadcrumb nav ────────────────────────────────────────────────────────
-	$_csb_config     = \BookaClass\Products\ProductTypes::get_config();
-	$_csb_class_base = sanitize_title( $_csb_config['types']['class']['classes_base'] ?? 'classes' );
+	// $_csb_class_base already set above.
 	?>
 	<nav class="csb-breadcrumb" aria-label="<?php esc_attr_e( 'مسیر صفحه', 'csb' ); ?>" dir="rtl">
 		<ol class="csb-breadcrumb__list" role="list">
@@ -82,6 +78,13 @@ $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( nul
 
 	<div class="csb-archive__layout" data-sidebar="<?php echo esc_attr( $archive_sidebar ); ?>">
 
+		<?php
+		// Pre-build type-filter URLs, preserving current category selection.
+		$_csb_url_type_all  = '' !== $active_cat ? add_query_arg( 'csb_cat', $active_cat, $archive_base_url ) : $archive_base_url;
+		$_csb_type_base     = $_csb_url_type_all;
+		$_csb_url_in_person = add_query_arg( 'csb_type', 'in_person', $_csb_type_base );
+		$_csb_url_online    = add_query_arg( 'csb_type', 'online', $_csb_type_base );
+		?>
 		<?php if ( 'none' !== $archive_sidebar ) : ?>
 		<aside class="csb-archive__sidebar" aria-label="<?php esc_attr_e( 'فیلتر و دسته‌بندی', 'csb' ); ?>">
 
@@ -96,14 +99,19 @@ $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( nul
 				<h3 class="csb-archive__sidebar-heading"><?php esc_html_e( 'دسته‌بندی', 'csb' ); ?></h3>
 				<ul class="csb-archive__cat-list">
 					<li>
-						<a href="<?php echo esc_url( $archive_base_url ); ?>"
+						<a href="<?php echo esc_url( '' !== $active_type ? add_query_arg( 'csb_type', $active_type, $archive_base_url ) : $archive_base_url ); ?>"
 							<?php echo '' === $active_cat ? ' aria-current="page"' : ''; ?>>
 							<?php esc_html_e( 'همه', 'csb' ); ?>
 						</a>
 					</li>
-					<?php foreach ( $archive_terms as $term ) : ?>
+					<?php foreach ( $archive_terms as $term ) :
+						$_csb_cat_url = add_query_arg( 'csb_cat', $term->slug, $archive_base_url );
+						if ( '' !== $active_type ) {
+							$_csb_cat_url = add_query_arg( 'csb_type', $active_type, $_csb_cat_url );
+						}
+					?>
 					<li>
-						<a href="<?php echo esc_url( add_query_arg( 'csb_cat', $term->slug, $archive_base_url ) ); ?>"
+						<a href="<?php echo esc_url( $_csb_cat_url ); ?>"
 							<?php echo $active_cat === $term->slug ? ' aria-current="page"' : ''; ?>>
 							<?php echo esc_html( $term->name ); ?>
 							<span class="csb-archive__cat-count">(<?php echo esc_html( (string) $term->count ); ?>)</span>
@@ -118,19 +126,19 @@ $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( nul
 				<h3 class="csb-archive__sidebar-heading"><?php esc_html_e( 'نوع برگزاری', 'csb' ); ?></h3>
 				<ul class="csb-archive__type-list">
 					<li>
-						<a href="<?php echo esc_url( $archive_base_url ); ?>"
+						<a href="<?php echo esc_url( $_csb_url_type_all ); ?>"
 							<?php echo '' === $active_type ? ' aria-current="page"' : ''; ?>>
 							<?php esc_html_e( 'همه', 'csb' ); ?>
 						</a>
 					</li>
 					<li>
-						<a href="<?php echo esc_url( add_query_arg( 'csb_type', 'in_person', $archive_base_url ) ); ?>"
+						<a href="<?php echo esc_url( $_csb_url_in_person ); ?>"
 							<?php echo 'in_person' === $active_type ? ' aria-current="page"' : ''; ?>>
 							<?php esc_html_e( 'حضوری', 'csb' ); ?>
 						</a>
 					</li>
 					<li>
-						<a href="<?php echo esc_url( add_query_arg( 'csb_type', 'online', $archive_base_url ) ); ?>"
+						<a href="<?php echo esc_url( $_csb_url_online ); ?>"
 							<?php echo 'online' === $active_type ? ' aria-current="page"' : ''; ?>>
 							<?php esc_html_e( 'آنلاین', 'csb' ); ?>
 						</a>
@@ -148,13 +156,18 @@ $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( nul
 
 				<div class="csb-archive__filter-group csb-archive__filter-cats">
 					<a class="csb-filter-chip <?php echo '' === $active_cat ? 'csb-filter-chip--active' : ''; ?>"
-						href="<?php echo esc_url( $archive_base_url ); ?>"
+						href="<?php echo esc_url( '' !== $active_type ? add_query_arg( 'csb_type', $active_type, $archive_base_url ) : $archive_base_url ); ?>"
 						<?php echo '' === $active_cat ? 'aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'همه', 'csb' ); ?>
 					</a>
-					<?php foreach ( $archive_terms as $term ) : ?>
+					<?php foreach ( $archive_terms as $term ) :
+						$_csb_chip_url = add_query_arg( 'csb_cat', $term->slug, $archive_base_url );
+						if ( '' !== $active_type ) {
+							$_csb_chip_url = add_query_arg( 'csb_type', $active_type, $_csb_chip_url );
+						}
+					?>
 					<a class="csb-filter-chip <?php echo $active_cat === $term->slug ? 'csb-filter-chip--active' : ''; ?>"
-						href="<?php echo esc_url( add_query_arg( 'csb_cat', $term->slug, $archive_base_url ) ); ?>"
+						href="<?php echo esc_url( $_csb_chip_url ); ?>"
 						<?php echo $active_cat === $term->slug ? 'aria-current="page"' : ''; ?>>
 						<?php echo esc_html( $term->name ); ?>
 					</a>
@@ -163,17 +176,17 @@ $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( nul
 
 				<div class="csb-archive__filter-group csb-archive__filter-types">
 					<a class="csb-filter-chip <?php echo '' === $active_type ? 'csb-filter-chip--active' : ''; ?>"
-						href="<?php echo esc_url( $archive_base_url ); ?>"
+						href="<?php echo esc_url( $_csb_url_type_all ); ?>"
 						<?php echo '' === $active_type ? 'aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'همه', 'csb' ); ?>
 					</a>
 					<a class="csb-filter-chip <?php echo 'in_person' === $active_type ? 'csb-filter-chip--active' : ''; ?>"
-						href="<?php echo esc_url( add_query_arg( 'csb_type', 'in_person', $archive_base_url ) ); ?>"
+						href="<?php echo esc_url( $_csb_url_in_person ); ?>"
 						<?php echo 'in_person' === $active_type ? 'aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'حضوری', 'csb' ); ?>
 					</a>
 					<a class="csb-filter-chip <?php echo 'online' === $active_type ? 'csb-filter-chip--active' : ''; ?>"
-						href="<?php echo esc_url( add_query_arg( 'csb_type', 'online', $archive_base_url ) ); ?>"
+						href="<?php echo esc_url( $_csb_url_online ); ?>"
 						<?php echo 'online' === $active_type ? 'aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'آنلاین', 'csb' ); ?>
 					</a>

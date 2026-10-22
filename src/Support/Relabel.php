@@ -36,15 +36,21 @@ class Relabel {
 	 * @var array<string,string>
 	 */
 	private const MAP = [
-		// product → دوره
-		'محصول'         => 'دوره',
-		'محصولات'       => 'دوره‌ها',
+		// product → دوره (Persian — when WC fa_IR is loaded)
+		'محصول'          => 'دوره',
+		'محصولات'        => 'دوره‌ها',
 		// shop → کلاس‌ها
-		'فروشگاه'       => 'کلاس‌ها',
+		'فروشگاه'        => 'کلاس‌ها',
 		// add-to-cart CTA
-		'افزودن به سبد' => 'ثبت‌نام / رزرو',
-		// order → ثبت‌نام (only in customer-facing context)
-		'سفارش'         => 'ثبت‌نام',
+		'افزودن به سبد'  => 'ثبت‌نام / رزرو',
+		// order → ثبت‌نام (customer-facing)
+		'سفارش'          => 'ثبت‌نام',
+		// English fallbacks — when the WooCommerce translation isn't loaded
+		'Product'        => 'دوره',
+		'Products'       => 'دوره‌ها',
+		'Shop'           => 'کلاس‌ها',
+		'Add to cart'    => 'ثبت‌نام / رزرو',
+		'Add to Cart'    => 'ثبت‌نام / رزرو',
 	];
 
 	/**
@@ -52,6 +58,45 @@ class Relabel {
 	 */
 	public function init(): void {
 		add_filter( 'gettext', [ $this, 'filter_gettext' ], 20, 3 );
+		add_filter( 'register_post_type_args', [ $this, 'relabel_product_labels' ], 20, 2 );
+	}
+
+	/**
+	 * Renames the WooCommerce `product` post-type labels to «دوره‌ها/کلاس‌ها»
+	 * so the admin menu + list screens read as a class platform — unless the
+	 * shop also sells physical goods (enable_ecommerce), where «محصولات» stays.
+	 *
+	 * @param  array<string,mixed> $args
+	 * @param  string              $post_type
+	 * @return array<string,mixed>
+	 */
+	public function relabel_product_labels( array $args, string $post_type ): array {
+		if ( 'product' !== $post_type ) {
+			return $args;
+		}
+
+		$settings = (array) get_option( 'csb_settings', [] );
+		if ( ! empty( $settings['enable_ecommerce'] ) ) {
+			return $args; // Physical-goods shop — keep WooCommerce «محصولات».
+		}
+
+		$args['labels'] = array_merge(
+			(array) ( $args['labels'] ?? [] ),
+			[
+				'name'          => 'دوره‌ها و کلاس‌ها',
+				'singular_name' => 'دوره',
+				'menu_name'     => 'دوره‌ها و کلاس‌ها',
+				'all_items'     => 'همهٔ دوره‌ها',
+				'add_new_item'  => 'افزودن دورهٔ جدید',
+				'edit_item'     => 'ویرایش دوره',
+				'new_item'      => 'دورهٔ جدید',
+				'view_item'     => 'مشاهدهٔ دوره',
+				'search_items'  => 'جستجوی دوره‌ها',
+				'not_found'     => 'دوره‌ای یافت نشد.',
+			]
+		);
+
+		return $args;
 	}
 
 	/**

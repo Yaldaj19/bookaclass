@@ -35,24 +35,20 @@ $card_cta_label  = esc_html( sanitize_text_field( $s['card_cta_label'] ?: __( '�
 // Active category filter from URL.
 $active_cat  = sanitize_title( (string) ( $_GET['csb_cat'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-// All product_cat terms for filter chips.
-$archive_terms = get_terms( [
-	'taxonomy'   => 'product_cat',
-	'hide_empty' => true,
-	'exclude'    => get_term_by( 'slug', 'uncategorized', 'product_cat' ) ? get_term_by( 'slug', 'uncategorized', 'product_cat' )->term_id : 0,
-] );
-$archive_terms = is_wp_error( $archive_terms ) ? [] : $archive_terms;
+// Only product_cat terms that actually have 'video_course' type products.
+$archive_terms = CardData::terms_for_type( 'video_course' );
 
-// Current archive URL base.
-$archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( null, 'courses/' );
+// Current archive URL base — must point to /courses/ (not the WC shop).
+$_csb_cfg_early   = \BookaClass\Products\ProductTypes::get_config();
+$_csb_video_base  = sanitize_title( $_csb_cfg_early['types']['video_course']['classes_base'] ?? 'courses' );
+$archive_base_url = trailingslashit( home_url( '/' . $_csb_video_base ) );
 ?>
 
 <main id="csb-archive-main" class="csb csb-main csb-archive csb-archive--<?php echo esc_attr( $archive_width ); ?>" dir="rtl">
 
 	<?php
 	// ── Breadcrumb nav ────────────────────────────────────────────────────────
-	$_csb_config      = \BookaClass\Products\ProductTypes::get_config();
-	$_csb_video_base  = sanitize_title( $_csb_config['types']['video_course']['classes_base'] ?? 'courses' );
+	// $_csb_video_base already set above.
 	?>
 	<nav class="csb-breadcrumb" aria-label="<?php esc_attr_e( 'مسیر صفحه', 'csb' ); ?>" dir="rtl">
 		<ol class="csb-breadcrumb__list" role="list">

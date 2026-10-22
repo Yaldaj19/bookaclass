@@ -163,6 +163,103 @@ class CardData {
 		return $name;
 	}
 
+	// ── Filtered terms for archive sidebar/chips ─────────────────────────────
+
+	/** Per-request cache: product_type slug → WP_Term[]. */
+	private static array $archive_terms_cache = [];
+
+	/**
+	 * Returns `product_cat` terms that contain at least one product of
+	 * $product_type_slug ('class' or 'video_course').
+	 *
+	 * One JOIN query, cached for the rest of the request.
+	 * `term->count` is overwritten with the type-scoped count.
+	 *
+	 * @param  string $product_type_slug  'class' or 'video_course'.
+	 * @return \WP_Term[]
+	 */
+	public static function terms_for_type( string $product_type_slug ): array {
+		if ( isset( self::$archive_terms_cache[ $product_type_slug ] ) ) {
+			return self::$archive_terms_cache[ $product_type_slug ];
+		}
+
+		global $wpdb;
+
+		// Find the term_id for the product_type term (e.g. 'class').
+		$type_term = get_term_by( 'slug', $product_type_slug, 'product_type' );
+		if ( ! $type_term ) {
+			self::$archive_terms_cache[ $product_type_slug ] = [];
+			return [];
+		}
+
+		$type_term_id = (int) $type_term->term_id;
+
+		// Uncategorized exclusion.
+		$uncategorized = get_term_by( 'slug', 'uncategorized', 'product_cat' );
+		$exclude_id    = $uncategorized ? (int) $uncategorized->term_id : 0;
+
+		// Single query: product_cat terms that share at least one product
+		// with the requested product_type term.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT pc_tt.term_id, COUNT(DISTINCT tr_pc.object_id) AS type_count
+				 FROM {$wpdb->term_relationships} tr_pt
+				 INNER JOIN {$wpdb->posts}             p      ON p.ID = tr_pt.object_id
+				                                              AND p.post_type   = 'product'
+				                                              AND p.post_status = 'publish'
+				 INNER JOIN {$wpdb->term_relationships} tr_pc  ON tr_pc.object_id = tr_pt.object_id
+				 INNER JOIN {$wpdb->term_taxonomy}      pc_tt  ON pc_tt.term_taxonomy_id = tr_pc.term_taxonomy_id
+				                                              AND pc_tt.taxonomy = 'product_cat'
+				                                              AND pc_tt.term_id  <> %d
+				 WHERE tr_pt.term_taxonomy_id = (
+				     SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy}
+				     WHERE term_id = %d AND taxonomy = 'product_type'
+				 )
+				 GROUP BY pc_tt.term_id
+				 HAVING type_count > 0",
+				$exclude_id,
+				$type_term_id
+			),
+			ARRAY_A
+		);
+
+		if ( ! $rows ) {
+			self::$archive_terms_cache[ $product_type_slug ] = [];
+			return [];
+		}
+
+		// Build a term_id → count map and fetch the WP_Term objects.
+		$count_map = [];
+		$term_ids  = [];
+		foreach ( $rows as $row ) {
+			$count_map[ (int) $row['term_id'] ] = (int) $row['type_count'];
+			$term_ids[] = (int) $row['term_id'];
+		}
+
+		$terms = get_terms( [
+			'taxonomy'   => 'product_cat',
+			'include'    => $term_ids,
+			'hide_empty' => false, // we already know they're non-empty
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		] );
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			self::$archive_terms_cache[ $product_type_slug ] = [];
+			return [];
+		}
+
+		// Overwrite count with the type-scoped value.
+		foreach ( $terms as $term ) {
+			/** @var \WP_Term $term */
+			$term->count = $count_map[ $term->term_id ] ?? 0;
+		}
+
+		self::$archive_terms_cache[ $product_type_slug ] = $terms;
+
+		return $terms;
+	}
+
 	// ── Category emoji ────────────────────────────────────────────────────────
 
 	/**
