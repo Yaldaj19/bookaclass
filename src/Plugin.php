@@ -26,8 +26,10 @@ use CookingSchoolBooking\Frontend\CartValidation;
 use CookingSchoolBooking\Frontend\CheckoutHooks;
 use CookingSchoolBooking\Frontend\OrderBooking;
 use CookingSchoolBooking\Frontend\Rewrites;
+use CookingSchoolBooking\Frontend\CsbArchiveSitemapProvider;
 use CookingSchoolBooking\Frontend\Schema;
 use CookingSchoolBooking\Frontend\SeoMeta;
+use CookingSchoolBooking\Frontend\Sitemap;
 use CookingSchoolBooking\Frontend\StyleVars;
 use CookingSchoolBooking\Install\Migrator;
 use CookingSchoolBooking\Products\ProductTypes;
@@ -134,6 +136,18 @@ final class Plugin {
 
 		// Phase 1 — SEO meta/title/OG (only when Rank Math/Yoast absent or forced).
 		( new SeoMeta() )->init();
+
+		// Phase 1 — Sitemap: ensure class/video singles + archives are discoverable.
+		( new Sitemap() )->init();
+
+		// Phase 1 — WP core sitemap provider for archive URLs (no-op when Rank Math/Yoast active).
+		if ( ! class_exists( 'RankMath' ) && ! defined( 'WPSEO_VERSION' ) ) {
+			add_action( 'init', static function (): void {
+				if ( function_exists( 'wp_sitemaps_get_server' ) ) {
+					wp_sitemaps_get_server()->registry->add_provider( new CsbArchiveSitemapProvider() );
+				}
+			}, 20 );
+		}
 
 		// Phase 1 — 301 redirects for slug changes.
 		( new RedirectManager() )->init();

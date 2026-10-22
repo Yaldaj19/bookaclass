@@ -49,7 +49,23 @@ $archive_terms = is_wp_error( $archive_terms ) ? [] : $archive_terms;
 $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( null, 'classes/' );
 ?>
 
-<section class="csb csb-main csb-archive csb-archive--<?php echo esc_attr( $archive_width ); ?>" dir="rtl" role="main">
+<main id="csb-archive-main" class="csb csb-main csb-archive csb-archive--<?php echo esc_attr( $archive_width ); ?>" dir="rtl">
+
+	<?php
+	// ── Breadcrumb nav ────────────────────────────────────────────────────────
+	$_csb_config     = \CookingSchoolBooking\Products\ProductTypes::get_config();
+	$_csb_class_base = sanitize_title( $_csb_config['types']['class']['classes_base'] ?? 'classes' );
+	?>
+	<nav class="csb-breadcrumb" aria-label="<?php esc_attr_e( 'مسیر صفحه', 'csb' ); ?>" dir="rtl">
+		<ol class="csb-breadcrumb__list" role="list">
+			<li class="csb-breadcrumb__item">
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'خانه', 'csb' ); ?></a>
+			</li>
+			<li class="csb-breadcrumb__item csb-breadcrumb__item--current" aria-current="page">
+				<?php echo esc_html( $archive_title ); ?>
+			</li>
+		</ol>
+	</nav>
 
 	<header class="csb-archive__header">
 		<h1 class="csb-archive__title"><?php echo esc_html( $archive_title ); ?></h1>
@@ -347,6 +363,6 @@ $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( nul
 
 	</div><!-- .csb-archive__layout -->
 
-</section><!-- .csb-archive -->
+</main><!-- .csb-archive -->
 
 <?php get_footer( 'shop' ); ?>

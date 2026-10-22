@@ -36,12 +36,32 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class StyleVars {
 
-	/** Google Fonts URL for Vazirmatn (covers wght 100–900). */
+	/** Google Fonts URL for Vazirmatn (covers wght 100–900, font-display=swap). */
 	private const VAZIRMATN_URL = 'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap';
 
 	public function init(): void {
 		add_action( 'wp_head',             [ $this, 'output_vars' ],    20 );
+		add_action( 'wp_head',             [ $this, 'output_preconnect' ], 1 );
 		add_action( 'wp_enqueue_scripts',  [ $this, 'enqueue_assets' ]      );
+	}
+
+	/**
+	 * Emits preconnect hints for Google Fonts origins when Vazirmatn will be loaded.
+	 * Runs at priority 1 so the hints appear before any stylesheet links.
+	 */
+	public function output_preconnect(): void {
+		if ( ! $this->is_csb_page() ) {
+			return;
+		}
+		$s = AppearancePage::get();
+		if ( 'system' === ( $s['font_family'] ?? '' ) ) {
+			return;
+		}
+		if ( $this->theme_loads_vazirmatn() ) {
+			return;
+		}
+		echo '<link rel="preconnect" href="https://fonts.googleapis.com" />' . "\n";
+		echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />' . "\n";
 	}
 
 	// ── CSS variable block ────────────────────────────────────────────────────
@@ -124,8 +144,8 @@ class StyleVars {
 	 * Returns true when the current request is a CSB-relevant page.
 	 */
 	private function is_csb_page(): bool {
-		// Custom query vars set by Rewrites (class/video_course archive + single).
-		if ( get_query_var( 'csb_archive' ) || get_query_var( 'csb_single' ) ) {
+		// Custom query vars set by Rewrites — archive OR single (csb_product_type is set on both).
+		if ( get_query_var( 'csb_archive' ) || '' !== (string) get_query_var( 'csb_product_type' ) ) {
 			return true;
 		}
 

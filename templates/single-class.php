@@ -44,6 +44,29 @@ $syllabus  = $product->get_csb_syllabus();
 $sessions = \CookingSchoolBooking\Services\CapacityService::get_upcoming_sessions( $post_id );
 ?>
 
+<?php
+// ── Breadcrumb nav (accessible, semantic) ─────────────────────────────────────
+$_csb_crumb_terms = wp_get_post_terms( $post_id, 'product_cat' );
+$_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb_terms ) ) ? $_csb_crumb_terms[0] : null;
+?>
+<nav class="csb-breadcrumb" aria-label="<?php esc_attr_e( 'مسیر صفحه', 'csb' ); ?>" dir="rtl">
+	<ol class="csb-breadcrumb__list" role="list">
+		<li class="csb-breadcrumb__item">
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'خانه', 'csb' ); ?></a>
+		</li>
+		<?php if ( $_csb_crumb_term ) : ?>
+		<li class="csb-breadcrumb__item">
+			<a href="<?php echo esc_url( (string) get_term_link( $_csb_crumb_term ) ); ?>">
+				<?php echo esc_html( $_csb_crumb_term->name ); ?>
+			</a>
+		</li>
+		<?php endif; ?>
+		<li class="csb-breadcrumb__item csb-breadcrumb__item--current" aria-current="page">
+			<?php echo esc_html( $title ); ?>
+		</li>
+	</ol>
+</nav>
+
 <main id="main" class="csb-main" role="main">
 	<article id="post-<?php echo esc_attr( (string) $post_id ); ?>" <?php post_class( 'csb-class-single' ); ?> dir="rtl"
 		itemscope itemtype="https://schema.org/Course">
