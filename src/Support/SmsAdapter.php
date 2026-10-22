@@ -13,12 +13,12 @@
  * common SMS plugins. When nothing is available it does NOT claim the
  * notification (so the e-mail fallback runs) and never hard-fails.
  *
- * @package CookingSchoolBooking\Support
+ * @package BookaClass\Support
  */
 
-namespace CookingSchoolBooking\Support;
+namespace BookaClass\Support;
 
-use CookingSchoolBooking\Services\AuditLogger;
+use BookaClass\Services\AuditLogger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

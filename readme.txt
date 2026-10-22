@@ -1,4 +1,4 @@
-=== Cooking School Booking ===
+=== BookaClass ===
 Contributors: developer
 Requires at least: 6.0
 Tested up to: 6.7
@@ -74,7 +74,7 @@ uninstalling the plugin also drops these tables.
 
 == Installation ==
 
-1. Upload the `cooking-school-booking` folder to `/wp-content/plugins/`.
+1. Upload the `bookaclass` folder to `/wp-content/plugins/`.
 2. Activate from **Plugins > Installed Plugins**.
 3. Make sure WooCommerce is active first.
 4. Go to **Settings > آموزشگاه** to configure deposit rates, settle days, wallet, and refund policy.

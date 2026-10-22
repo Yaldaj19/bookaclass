@@ -5,10 +5,10 @@
  * Inherently virtual. Purchase grants an enrollment (Phase 5).
  * Lessons stored as JSON in `_csb_lessons`.
  *
- * @package CookingSchoolBooking\Products
+ * @package BookaClass\Products
  */
 
-namespace CookingSchoolBooking\Products;
+namespace BookaClass\Products;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

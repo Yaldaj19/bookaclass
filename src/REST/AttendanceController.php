@@ -11,13 +11,13 @@
  * All mutation routes require manage_woocommerce or csb_view_sessions capability.
  * The verify route is public (no authentication required).
  *
- * @package CookingSchoolBooking\REST
+ * @package BookaClass\REST
  */
 
-namespace CookingSchoolBooking\REST;
+namespace BookaClass\REST;
 
-use CookingSchoolBooking\Services\AttendanceService;
-use CookingSchoolBooking\Services\CertificateService;
+use BookaClass\Services\AttendanceService;
+use BookaClass\Services\CertificateService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -200,7 +200,7 @@ class AttendanceController {
 			'serial'       => $cert['serial'],
 			'student_name' => $student ? $student->display_name : '',
 			'course_title' => $course  ? $course->post_title    : '',
-			'issued_at'    => \CookingSchoolBooking\Support\Jalali::to_jalali_string( $cert['issued_at'] ),
+			'issued_at'    => \BookaClass\Support\Jalali::to_jalali_string( $cert['issued_at'] ),
 		] );
 	}
 }

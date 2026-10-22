@@ -6,10 +6,10 @@
  * Rule: only ever ADDS columns/indexes, never destructively removes them,
  * so existing data survives upgrades.
  *
- * @package CookingSchoolBooking\Install
+ * @package BookaClass\Install
  */
 
-namespace CookingSchoolBooking\Install;
+namespace BookaClass\Install;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

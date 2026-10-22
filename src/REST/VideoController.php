@@ -19,14 +19,14 @@
  * All state-altering requests check the WP REST nonce automatically (X-WP-Nonce).
  * GET endpoints are nonce-free so the signed URL can be embedded in <video src>.
  *
- * @package CookingSchoolBooking\REST
+ * @package BookaClass\REST
  */
 
-namespace CookingSchoolBooking\REST;
+namespace BookaClass\REST;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\EnrollmentService;
-use CookingSchoolBooking\Services\VideoAccessService;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\EnrollmentService;
+use BookaClass\Services\VideoAccessService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -141,7 +141,7 @@ class VideoController {
 			return new \WP_REST_Response( [ 'success' => false, 'error' => 'course_not_found' ], 404 );
 		}
 
-		/** @var \CookingSchoolBooking\Products\VideoCourseProduct $product */
+		/** @var \BookaClass\Products\VideoCourseProduct $product */
 		$lessons = $product->get_csb_lessons();
 
 		if ( ! isset( $lessons[ $lesson_index ] ) ) {
@@ -161,7 +161,7 @@ class VideoController {
 			return new \WP_REST_Response( [ 'success' => false, 'error' => 'access_denied' ], 403 );
 		}
 
-		$settings = \CookingSchoolBooking\Admin\SettingsPage::get();
+		$settings = \BookaClass\Admin\SettingsPage::get();
 		$host     = $settings['video_host'] ?? 'local';
 
 		AuditLogger::log( 'video_stream_requested', 'enrollment', 0, [
@@ -195,7 +195,7 @@ class VideoController {
 			return new \WP_REST_Response( [ 'success' => false, 'error' => 'course_not_found' ], 404 );
 		}
 
-		/** @var \CookingSchoolBooking\Products\VideoCourseProduct $product */
+		/** @var \BookaClass\Products\VideoCourseProduct $product */
 		$lessons = $product->get_csb_lessons();
 
 		if ( ! isset( $lessons[ $lesson_index ] ) ) {
@@ -278,7 +278,7 @@ class VideoController {
 			wp_die( esc_html__( 'دوره یافت نشد.', 'csb' ), '', [ 'response' => 404 ] );
 		}
 
-		/** @var \CookingSchoolBooking\Products\VideoCourseProduct $product */
+		/** @var \BookaClass\Products\VideoCourseProduct $product */
 		$lessons = $product->get_csb_lessons();
 
 		if ( ! isset( $lessons[ $lesson_index ] ) ) {

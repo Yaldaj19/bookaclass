@@ -5,7 +5,7 @@
  * Loaded via Rewrites::maybe_load_template() when the product type is 'class'.
  * Wraps WP standard page chrome; actual product data rendered from $product.
  *
- * @package CookingSchoolBooking
+ * @package BookaClass
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -14,7 +14,7 @@ get_header( 'shop' );
 
 global $product;
 
-if ( ! $product instanceof \CookingSchoolBooking\Products\ClassProduct ) {
+if ( ! $product instanceof \BookaClass\Products\ClassProduct ) {
 	$product = wc_get_product( get_the_ID() );
 }
 
@@ -41,7 +41,7 @@ $materials = array_filter( array_map( 'trim', explode( "\n", $product->get_csb_m
 $syllabus  = $product->get_csb_syllabus();
 
 // Upcoming sessions for this class, including live locked-seat counts.
-$sessions = \CookingSchoolBooking\Services\CapacityService::get_upcoming_sessions( $post_id );
+$sessions = \BookaClass\Services\CapacityService::get_upcoming_sessions( $post_id );
 ?>
 
 <?php
@@ -75,7 +75,7 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 		<header class="csb-hero">
 			<?php
 			// Hero image: featured thumbnail or emoji placeholder.
-			use CookingSchoolBooking\Frontend\CardData;
+			use BookaClass\Frontend\CardData;
 			$_hero_cat   = CardData::category_name( $post_id );
 			$_hero_emoji = CardData::emoji_for_category( $_hero_cat );
 			?>
@@ -120,10 +120,10 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 				<ul class="csb-sessions__list" role="list">
 					<?php foreach ( $sessions as $session ) :
 						$session_id  = (int) $session['id'];
-						$jalali      = \CookingSchoolBooking\Support\Jalali::toJalali( $session['start_at'] );
-						$time_fmt    = \CookingSchoolBooking\Support\Jalali::toJalali( $session['start_at'], 'H:i' );
+						$jalali      = \BookaClass\Support\Jalali::toJalali( $session['start_at'] );
+						$time_fmt    = \BookaClass\Support\Jalali::toJalali( $session['start_at'], 'H:i' );
 						// Available includes locked-seat deduction (live accurate count).
-						$seats_avail = \CookingSchoolBooking\Services\CapacityService::available_seats( $session_id );
+						$seats_avail = \BookaClass\Services\CapacityService::available_seats( $session_id );
 					?>
 						<li class="csb-session-item <?php echo 0 === $seats_avail ? 'csb-session-item--full' : ''; ?>">
 							<span class="csb-session-item__date">
@@ -150,14 +150,14 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 								  csb_payment_mode → CheckoutHooks::inject_deposit_cart_data()
 								-->
 								<?php
-								$settings         = \CookingSchoolBooking\Admin\SettingsPage::get();
+								$settings         = \BookaClass\Admin\SettingsPage::get();
 								$full_price       = (float) $product->get_price();
 								$deposit_percent  = (float) ( $settings['deposit_default_percent'] ?? 30 );
 
 								// Per-product deposit override.
-								$dep_type         = $product instanceof \CookingSchoolBooking\Products\ClassProduct
+								$dep_type         = $product instanceof \BookaClass\Products\ClassProduct
 									? $product->get_csb_deposit_type() : '';
-								$dep_value        = $product instanceof \CookingSchoolBooking\Products\ClassProduct
+								$dep_value        = $product instanceof \BookaClass\Products\ClassProduct
 									? (float) $product->get_csb_deposit_value() : 0;
 
 								if ( 'fixed' === $dep_type && $dep_value > 0 ) {

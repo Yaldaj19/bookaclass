@@ -14,10 +14,10 @@
  *   - Old session: CapacityService::release_seat() inside the same transaction.
  *   Net change = 0 seats across the system — always correct.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

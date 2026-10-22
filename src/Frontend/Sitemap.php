@@ -18,12 +18,12 @@
  *
  * We never suppress any existing sitemap authority — only supplement.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Products\ProductTypes;
+use BookaClass\Products\ProductTypes;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

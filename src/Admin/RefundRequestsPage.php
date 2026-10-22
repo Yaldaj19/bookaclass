@@ -8,12 +8,12 @@
  * Admin can approve (cash or wallet) or reject.
  * Calls RefundService::approve_refund() / reject_refund().
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
-use CookingSchoolBooking\Services\RefundService;
+use BookaClass\Services\RefundService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -184,12 +184,12 @@ class RefundRequestsPage {
 								<td><?php echo esc_html( $req['student_name'] ?? '—' ); ?></td>
 								<td>
 									<?php echo esc_html( $req['class_title'] ); ?><br>
-									<small><?php echo esc_html( \CookingSchoolBooking\Support\Jalali::to_jalali_string( $req['start_at'] ) ); ?></small>
+									<small><?php echo esc_html( \BookaClass\Support\Jalali::to_jalali_string( $req['start_at'] ) ); ?></small>
 								</td>
 								<td><?php echo esc_html( $tier_labels[ $req['policy_tier'] ] ?? $req['policy_tier'] ); ?></td>
 								<td><?php echo esc_html( number_format_i18n( (float) $req['refund_amount'] ) ); ?></td>
 								<td><?php echo esc_html( $req['status'] ); ?></td>
-								<td><?php echo esc_html( \CookingSchoolBooking\Support\Jalali::to_jalali_string( $req['created_at'] ) ); ?></td>
+								<td><?php echo esc_html( \BookaClass\Support\Jalali::to_jalali_string( $req['created_at'] ) ); ?></td>
 								<td>
 									<?php if ( 'pending' === $req['status'] ) : ?>
 										<!-- Approve form with method choice -->

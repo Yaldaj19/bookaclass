@@ -14,13 +14,13 @@
  * All form actions guarded with nonces + manage_woocommerce capability.
  * All SQL prepared via $wpdb->prepare(). All output escaped.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
-use CookingSchoolBooking\Services\AttendanceService;
-use CookingSchoolBooking\Services\BookingService;
+use BookaClass\Services\AttendanceService;
+use BookaClass\Services\BookingService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -121,12 +121,12 @@ class BookingsPage {
 				$r['student_name'],
 				$r['student_email'],
 				$r['class_title'],
-				\CookingSchoolBooking\Support\Jalali::to_jalali_string( $r['start_at'] ),
+				\BookaClass\Support\Jalali::to_jalali_string( $r['start_at'] ),
 				$r['status'],
 				$r['deposit_amount'],
 				$r['balance_due'],
 				$r['paid_amount'],
-				\CookingSchoolBooking\Support\Jalali::to_jalali_string( $r['created_at'] ),
+				\BookaClass\Support\Jalali::to_jalali_string( $r['created_at'] ),
 			] );
 		}
 
@@ -227,7 +227,7 @@ class BookingsPage {
 					<?php foreach ( $sessions as $s ) : ?>
 						<option value="<?php echo esc_attr( (string) $s['id'] ); ?>"
 							<?php selected( $filters['session_id'], (int) $s['id'] ); ?>>
-							<?php echo esc_html( $s['class_title'] . ' — ' . \CookingSchoolBooking\Support\Jalali::to_jalali_string( $s['start_at'] ) ); ?>
+							<?php echo esc_html( $s['class_title'] . ' — ' . \BookaClass\Support\Jalali::to_jalali_string( $s['start_at'] ) ); ?>
 						</option>
 					<?php endforeach; ?>
 				</select>
@@ -270,7 +270,7 @@ class BookingsPage {
 								</td>
 								<td>
 									<?php echo esc_html( $b['class_title'] ); ?><br>
-									<small><?php echo esc_html( \CookingSchoolBooking\Support\Jalali::to_jalali_string( $b['start_at'] ) ); ?></small>
+									<small><?php echo esc_html( \BookaClass\Support\Jalali::to_jalali_string( $b['start_at'] ) ); ?></small>
 								</td>
 								<td>
 									<?php echo esc_html( $status_labels[ $b['status'] ] ?? $b['status'] ); ?>

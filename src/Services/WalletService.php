@@ -8,12 +8,12 @@
  *
  * Guard: silently skips all writes when enable_wallet = false.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
-use CookingSchoolBooking\Admin\SettingsPage;
+use BookaClass\Admin\SettingsPage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

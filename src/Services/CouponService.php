@@ -9,10 +9,10 @@
  *
  * Idempotency: `_csb_coupon_applied` order meta prevents double-counting.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

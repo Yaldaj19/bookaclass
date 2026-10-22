@@ -9,14 +9,14 @@
  * Card data (sessions, instructor, category) comes from CardData helpers.
  * All prices are formatted with wc_price() so WooCommerce currency settings apply.
  *
- * @package CookingSchoolBooking
+ * @package BookaClass
  */
 
 defined( 'ABSPATH' ) || exit;
 
-use CookingSchoolBooking\Admin\AppearancePage;
-use CookingSchoolBooking\Frontend\CardData;
-use CookingSchoolBooking\Support\Jalali;
+use BookaClass\Admin\AppearancePage;
+use BookaClass\Frontend\CardData;
+use BookaClass\Support\Jalali;
 
 get_header( 'shop' );
 
@@ -53,7 +53,7 @@ $archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( nul
 
 	<?php
 	// ── Breadcrumb nav ────────────────────────────────────────────────────────
-	$_csb_config     = \CookingSchoolBooking\Products\ProductTypes::get_config();
+	$_csb_config     = \BookaClass\Products\ProductTypes::get_config();
 	$_csb_class_base = sanitize_title( $_csb_config['types']['class']['classes_base'] ?? 'classes' );
 	?>
 	<nav class="csb-breadcrumb" aria-label="<?php esc_attr_e( 'مسیر صفحه', 'csb' ); ?>" dir="rtl">

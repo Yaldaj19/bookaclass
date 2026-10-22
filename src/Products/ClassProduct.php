@@ -6,10 +6,10 @@
  * All meta stored with `_csb_` prefix; logic (capacity, deposit, booking) is
  * wired in later phases.
  *
- * @package CookingSchoolBooking\Products
+ * @package BookaClass\Products
  */
 
-namespace CookingSchoolBooking\Products;
+namespace BookaClass\Products;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

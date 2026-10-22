@@ -10,13 +10,13 @@
  *  — Release locks when cart items are removed or the cart is cleared.
  *  — Display a human-readable session summary in the cart/checkout tables.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Services\CapacityService;
-use CookingSchoolBooking\Support\Jalali;
+use BookaClass\Services\CapacityService;
+use BookaClass\Support\Jalali;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -16,13 +16,13 @@
  * All notifications go through NotificationService::dispatch() — Phase 7
  * attaches the SMS adapter without touching this cron.
  *
- * @package CookingSchoolBooking\Cron
+ * @package BookaClass\Cron
  */
 
-namespace CookingSchoolBooking\Cron;
+namespace BookaClass\Cron;
 
-use CookingSchoolBooking\Admin\SettingsPage;
-use CookingSchoolBooking\Services\NotificationService;
+use BookaClass\Admin\SettingsPage;
+use BookaClass\Services\NotificationService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

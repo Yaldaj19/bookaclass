@@ -20,12 +20,12 @@
  *   --csb-container      max-width of content container (px)
  *   --csb-font           font-family stack
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Admin\AppearancePage;
+use BookaClass\Admin\AppearancePage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

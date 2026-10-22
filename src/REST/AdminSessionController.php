@@ -8,13 +8,13 @@
  * Requires manage_woocommerce. Fires do_action('csb_bulk_sms', $booking_ids, $message)
  * which Phase 7 SMS adapters hook into.
  *
- * @package CookingSchoolBooking\REST
+ * @package BookaClass\REST
  */
 
-namespace CookingSchoolBooking\REST;
+namespace BookaClass\REST;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\NotificationService;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\NotificationService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

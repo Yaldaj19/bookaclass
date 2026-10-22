@@ -12,10 +12,10 @@
  * Brute-force guard: 5 wrong attempts invalidates the token.
  * Tokens expire after 10 minutes.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

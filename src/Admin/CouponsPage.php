@@ -5,14 +5,14 @@
  * Provides a simple CRUD interface for CSB-scoped discount codes.
  * Listed under the «آموزشگاه» top-level menu.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\CouponService;
-use CookingSchoolBooking\Support\Jalali;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\CouponService;
+use BookaClass\Support\Jalali;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

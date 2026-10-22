@@ -21,10 +21,10 @@
  * `auto_approve = true` so the cron can issue refunds immediately
  * without waiting for admin action.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

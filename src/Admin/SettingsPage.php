@@ -5,10 +5,10 @@
  * Registers the csb_settings option group and renders the admin form.
  * All defaults are defined here; individual classes can override specific values.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

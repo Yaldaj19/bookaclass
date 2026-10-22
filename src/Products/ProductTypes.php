@@ -6,10 +6,10 @@
  * `csb_cpt_config` option so they can be changed from the admin panel
  * without touching code (§16.5.1).
  *
- * @package CookingSchoolBooking\Products
+ * @package BookaClass\Products
  */
 
-namespace CookingSchoolBooking\Products;
+namespace BookaClass\Products;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -287,7 +287,7 @@ class ProductTypes {
 
 		// Pull current values — works for both new products and existing ones.
 		$eb_until_ts   = (int) get_post_meta( $post->ID, '_csb_earlybird_until', true );
-		$eb_until_jalali = $eb_until_ts > 0 ? \CookingSchoolBooking\Support\Jalali::to_jalali_string(
+		$eb_until_jalali = $eb_until_ts > 0 ? \BookaClass\Support\Jalali::to_jalali_string(
 			gmdate( 'Y-m-d', $eb_until_ts )
 		) : '';
 
@@ -578,7 +578,7 @@ class ProductTypes {
 		$eb_ts     = 0;
 		if ( '' !== $eb_jalali ) {
 			try {
-				$greg  = \CookingSchoolBooking\Support\Jalali::toGregorian( $eb_jalali );
+				$greg  = \BookaClass\Support\Jalali::toGregorian( $eb_jalali );
 				$eb_ts = (int) strtotime( $greg );
 			} catch ( \Throwable $e ) {
 				$eb_ts = 0; // invalid input — silently ignore.

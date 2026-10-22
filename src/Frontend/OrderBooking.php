@@ -27,18 +27,18 @@
  *   Primary order: _csb_booking_id on order item guards double-creation.
  *   Balance order: _csb_balance_settled on balance order guards double-confirmation.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\BookingService;
-use CookingSchoolBooking\Services\CapacityService;
-use CookingSchoolBooking\Services\CouponService;
-use CookingSchoolBooking\Services\EnrollmentService;
-use CookingSchoolBooking\Services\SettlementService;
-use CookingSchoolBooking\Services\WalletService;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\BookingService;
+use BookaClass\Services\CapacityService;
+use BookaClass\Services\CouponService;
+use BookaClass\Services\EnrollmentService;
+use BookaClass\Services\SettlementService;
+use BookaClass\Services\WalletService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -291,7 +291,7 @@ class OrderBooking {
 				continue;
 			}
 
-			/** @var \CookingSchoolBooking\Products\VideoCourseProduct $product */
+			/** @var \BookaClass\Products\VideoCourseProduct $product */
 			$duration_days = $product->get_csb_access_duration() ?: null;
 
 			try {

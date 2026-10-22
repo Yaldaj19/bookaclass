@@ -15,12 +15,12 @@
  * Token TTL: 4 hours by default.  Tokens are single-use for download links,
  * multi-use (re-validated per-request) for stream links.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
-use CookingSchoolBooking\Admin\SettingsPage;
+use BookaClass\Admin\SettingsPage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

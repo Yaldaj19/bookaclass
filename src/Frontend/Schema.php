@@ -15,15 +15,15 @@
  *   but this class STILL emits Course / VideoObject / ItemList because
  *   those plugins do not generate those types.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Products\ClassProduct;
-use CookingSchoolBooking\Products\ProductTypes;
-use CookingSchoolBooking\Products\VideoCourseProduct;
-use CookingSchoolBooking\Support\Jalali;
+use BookaClass\Products\ClassProduct;
+use BookaClass\Products\ProductTypes;
+use BookaClass\Products\VideoCourseProduct;
+use BookaClass\Support\Jalali;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

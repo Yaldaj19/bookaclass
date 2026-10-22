@@ -2,46 +2,46 @@
 /**
  * Main plugin bootstrap — singleton entry point.
  *
- * @package CookingSchoolBooking
+ * @package BookaClass
  */
 
-namespace CookingSchoolBooking;
+namespace BookaClass;
 
-use CookingSchoolBooking\Admin\AppearancePage;
-use CookingSchoolBooking\Admin\AttendancePage;
-use CookingSchoolBooking\Admin\BookingsPage;
-use CookingSchoolBooking\Admin\CalendarPage;
-use CookingSchoolBooking\Admin\ContentTypesPage;
-use CookingSchoolBooking\Admin\CouponsPage;
-use CookingSchoolBooking\Admin\InstructorPanel;
-use CookingSchoolBooking\Admin\RefundRequestsPage;
-use CookingSchoolBooking\Admin\SessionsPage;
-use CookingSchoolBooking\Admin\SettingsHub;
-use CookingSchoolBooking\Admin\SettingsPage;
-use CookingSchoolBooking\Cron\ExpireUnsettledCron;
-use CookingSchoolBooking\Cron\MarkCompletedCron;
-use CookingSchoolBooking\Cron\MinToRunCron;
-use CookingSchoolBooking\Cron\ReminderCron;
-use CookingSchoolBooking\Cron\SeatLockCron;
-use CookingSchoolBooking\Frontend\CartValidation;
-use CookingSchoolBooking\Frontend\CheckoutHooks;
-use CookingSchoolBooking\Frontend\OrderBooking;
-use CookingSchoolBooking\Frontend\Rewrites;
-use CookingSchoolBooking\Frontend\CsbArchiveSitemapProvider;
-use CookingSchoolBooking\Frontend\Schema;
-use CookingSchoolBooking\Frontend\SeoMeta;
-use CookingSchoolBooking\Frontend\Sitemap;
-use CookingSchoolBooking\Frontend\StyleVars;
-use CookingSchoolBooking\Install\Migrator;
-use CookingSchoolBooking\Products\ProductTypes;
-use CookingSchoolBooking\Frontend\MyAccount;
-use CookingSchoolBooking\REST\AdminSessionController;
-use CookingSchoolBooking\REST\AttendanceController;
-use CookingSchoolBooking\REST\BookingController;
-use CookingSchoolBooking\REST\OtpController;
-use CookingSchoolBooking\REST\VideoController;
-use CookingSchoolBooking\Support\RedirectManager;
-use CookingSchoolBooking\Support\Relabel;
+use BookaClass\Admin\AppearancePage;
+use BookaClass\Admin\AttendancePage;
+use BookaClass\Admin\BookingsPage;
+use BookaClass\Admin\CalendarPage;
+use BookaClass\Admin\ContentTypesPage;
+use BookaClass\Admin\CouponsPage;
+use BookaClass\Admin\InstructorPanel;
+use BookaClass\Admin\RefundRequestsPage;
+use BookaClass\Admin\SessionsPage;
+use BookaClass\Admin\SettingsHub;
+use BookaClass\Admin\SettingsPage;
+use BookaClass\Cron\ExpireUnsettledCron;
+use BookaClass\Cron\MarkCompletedCron;
+use BookaClass\Cron\MinToRunCron;
+use BookaClass\Cron\ReminderCron;
+use BookaClass\Cron\SeatLockCron;
+use BookaClass\Frontend\CartValidation;
+use BookaClass\Frontend\CheckoutHooks;
+use BookaClass\Frontend\OrderBooking;
+use BookaClass\Frontend\Rewrites;
+use BookaClass\Frontend\CsbArchiveSitemapProvider;
+use BookaClass\Frontend\Schema;
+use BookaClass\Frontend\SeoMeta;
+use BookaClass\Frontend\Sitemap;
+use BookaClass\Frontend\StyleVars;
+use BookaClass\Install\Migrator;
+use BookaClass\Products\ProductTypes;
+use BookaClass\Frontend\MyAccount;
+use BookaClass\REST\AdminSessionController;
+use BookaClass\REST\AttendanceController;
+use BookaClass\REST\BookingController;
+use BookaClass\REST\OtpController;
+use BookaClass\REST\VideoController;
+use BookaClass\Support\RedirectManager;
+use BookaClass\Support\Relabel;
 // Services are loaded via autoloader; no use-statement needed for static-only classes.
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -227,10 +227,10 @@ final class Plugin {
 		( new OtpController() )->init();
 
 		// Phase 7 — SMS adapter: hooks csb_notify + csb_bulk_sms onto the SMS gateway plugin.
-		( new \CookingSchoolBooking\Support\SmsAdapter() )->init();
+		( new \BookaClass\Support\SmsAdapter() )->init();
 
 		// Phase 7 — Cron: purge expired OTP tokens (daily).
-		add_action( 'csb_purge_otp', [ \CookingSchoolBooking\Services\OtpService::class, 'purge_expired' ] );
+		add_action( 'csb_purge_otp', [ \BookaClass\Services\OtpService::class, 'purge_expired' ] );
 	}
 
 	// ─── Admin menu ───────────────────────────────────────────────────────────

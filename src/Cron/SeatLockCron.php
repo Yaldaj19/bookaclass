@@ -6,13 +6,13 @@
  * Keeps the seat_locks table small and ensures temporary holds don't block
  * real customers indefinitely.
  *
- * @package CookingSchoolBooking\Cron
+ * @package BookaClass\Cron
  */
 
-namespace CookingSchoolBooking\Cron;
+namespace BookaClass\Cron;
 
-use CookingSchoolBooking\Services\CapacityService;
-use CookingSchoolBooking\Services\AuditLogger;
+use BookaClass\Services\CapacityService;
+use BookaClass\Services\AuditLogger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

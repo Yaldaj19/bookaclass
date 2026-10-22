@@ -6,12 +6,12 @@
  *
  * URL pattern: ?page=csb-attendance&session_id=123
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
-use CookingSchoolBooking\Services\AttendanceService;
+use BookaClass\Services\AttendanceService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -108,7 +108,7 @@ class AttendancePage {
 						<option value="<?php echo esc_attr( (string) $s['id'] ); ?>" <?php selected( $session_id, (int) $s['id'] ); ?>>
 							<?php echo esc_html(
 								$s['class_title'] . ' — ' .
-								\CookingSchoolBooking\Support\Jalali::to_jalali_string( $s['start_at'] )
+								\BookaClass\Support\Jalali::to_jalali_string( $s['start_at'] )
 							); ?>
 						</option>
 					<?php endforeach; ?>

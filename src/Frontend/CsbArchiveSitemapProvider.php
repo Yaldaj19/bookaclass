@@ -5,10 +5,10 @@
  *
  * Only registered when neither Rank Math nor Yoast is active.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

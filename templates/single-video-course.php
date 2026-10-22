@@ -11,18 +11,18 @@
  * Video is loaded lazily via REST (csb/v1/video/{course}/{index}/stream) so that
  * the signed URL is generated at play time, not at page render time.
  *
- * @package CookingSchoolBooking
+ * @package BookaClass
  */
 
 defined( 'ABSPATH' ) || exit;
 
-use CookingSchoolBooking\Services\EnrollmentService;
+use BookaClass\Services\EnrollmentService;
 
 get_header( 'shop' );
 
 global $product;
 
-if ( ! $product instanceof \CookingSchoolBooking\Products\VideoCourseProduct ) {
+if ( ! $product instanceof \BookaClass\Products\VideoCourseProduct ) {
 	$product = wc_get_product( get_the_ID() );
 }
 
@@ -96,7 +96,7 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 		<header class="csb-hero">
 			<?php
 			// Hero image: featured thumbnail or emoji placeholder.
-			use CookingSchoolBooking\Frontend\CardData;
+			use BookaClass\Frontend\CardData;
 			$_hero_cat   = CardData::category_name( $post_id );
 			$_hero_emoji = CardData::emoji_for_category( $_hero_cat );
 			?>

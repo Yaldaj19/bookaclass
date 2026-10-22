@@ -12,10 +12,10 @@
  *
  * A cron (`csb_release_locks`) calls release_expired() every 5 minutes.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

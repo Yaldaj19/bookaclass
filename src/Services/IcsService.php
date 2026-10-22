@@ -8,10 +8,10 @@
  * Timezone: Asia/Tehran (IANA).  A VTIMEZONE component is embedded for clients
  * that cannot look up the TZID themselves.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

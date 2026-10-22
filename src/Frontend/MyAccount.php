@@ -8,19 +8,19 @@
  *   csb-wallet   — balance + paginated txn history
  *   csb-certs    — printable certificates (also handles ?csb_cert=SERIAL public view)
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Admin\SettingsPage;
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\BookingService;
-use CookingSchoolBooking\Services\CertificateService;
-use CookingSchoolBooking\Services\EnrollmentService;
-use CookingSchoolBooking\Services\IcsService;
-use CookingSchoolBooking\Services\RefundService;
-use CookingSchoolBooking\Services\WalletService;
+use BookaClass\Admin\SettingsPage;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\BookingService;
+use BookaClass\Services\CertificateService;
+use BookaClass\Services\EnrollmentService;
+use BookaClass\Services\IcsService;
+use BookaClass\Services\RefundService;
+use BookaClass\Services\WalletService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -213,7 +213,7 @@ class MyAccount {
 		foreach ( $bookings as $b ) {
 			$bid       = (int) $b['id'];
 			$status    = $b['status'];
-			$start_j   = \CookingSchoolBooking\Support\Jalali::to_jalali_string( $b['start_at'] );
+			$start_j   = \BookaClass\Support\Jalali::to_jalali_string( $b['start_at'] );
 			$can_cancel = in_array( $status, [ 'pending', 'deposit_paid', 'fully_paid', 'confirmed' ], true );
 
 			echo '<tr>';
@@ -387,7 +387,7 @@ class MyAccount {
 				$cls = 'credit' === $t['direction'] ? 'csb-txn--credit' : 'csb-txn--debit';
 				$lbl = 'credit' === $t['direction'] ? __( 'واریز', 'csb' ) : __( 'برداشت', 'csb' );
 				echo '<tr class="' . esc_attr( $cls ) . '">';
-				echo '<td>' . esc_html( \CookingSchoolBooking\Support\Jalali::to_jalali_string( $t['created_at'] ) ) . '</td>';
+				echo '<td>' . esc_html( \BookaClass\Support\Jalali::to_jalali_string( $t['created_at'] ) ) . '</td>';
 				echo '<td>' . esc_html( $lbl ) . '</td>';
 				echo '<td>' . esc_html( number_format_i18n( (float) $t['amount'] ) ) . '</td>';
 				echo '<td>' . esc_html( number_format_i18n( (float) $t['balance_after'] ) ) . '</td>';
@@ -434,7 +434,7 @@ class MyAccount {
 		echo '<div class="csb-certs-list">';
 		foreach ( $certs as $cert ) {
 			$course_title = get_the_title( (int) $cert['course_id'] );
-			$issued_j     = \CookingSchoolBooking\Support\Jalali::to_jalali_string( $cert['issued_at'] );
+			$issued_j     = \BookaClass\Support\Jalali::to_jalali_string( $cert['issued_at'] );
 			$view_url     = add_query_arg( 'csb_cert', rawurlencode( $cert['serial'] ), home_url( '/' ) );
 
 			echo '<div class="csb-cert-card">';
@@ -474,7 +474,7 @@ class MyAccount {
 		$course     = get_post( (int) $cert['course_id'] );
 		$student_name = $student ? $student->display_name : '';
 		$course_title = $course  ? $course->post_title    : '';
-		$issued_j     = \CookingSchoolBooking\Support\Jalali::to_jalali_string( $cert['issued_at'] );
+		$issued_j     = \BookaClass\Support\Jalali::to_jalali_string( $cert['issued_at'] );
 		$site_name    = get_bloginfo( 'name' );
 
 		// Render a standalone printable HTML page — no WP theme wrapper.
@@ -633,7 +633,7 @@ body{font-family:Tahoma,Arial,sans-serif;background:#f5f0e8;display:flex;justify
 		echo '<strong>' . esc_html__( 'انتخاب جلسه جدید:', 'csb' ) . '</strong>';
 		echo '<select class="csb-rs-select" style="max-width:100%;margin:.4em 0;display:block;">';
 		foreach ( $alt_sessions as $s ) {
-			$label = \CookingSchoolBooking\Support\Jalali::to_jalali_string( $s['start_at'] )
+			$label = \BookaClass\Support\Jalali::to_jalali_string( $s['start_at'] )
 				. ' (' . __( 'ظرفیت باقی:', 'csb' ) . ' '
 				. ( (int) $s['capacity'] - (int) $s['seats_taken'] ) . ')';
 			echo '<option value="' . esc_attr( (string) (int) $s['id'] ) . '">' . esc_html( $label ) . '</option>';

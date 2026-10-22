@@ -13,15 +13,15 @@
  *   2. Calls Rewrites::flush() to defer flush_rewrite_rules().
  *   3. Logs to audit via AuditLogger.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
-use CookingSchoolBooking\Frontend\Rewrites;
-use CookingSchoolBooking\Products\ProductTypes;
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Support\RedirectManager;
+use BookaClass\Frontend\Rewrites;
+use BookaClass\Products\ProductTypes;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Support\RedirectManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

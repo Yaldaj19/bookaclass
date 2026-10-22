@@ -9,14 +9,14 @@
  * When Rank Math / Yoast is present and seo_manager = 'external' (or 'auto'),
  * this class does nothing — Schema.php still runs independently.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Products\ClassProduct;
-use CookingSchoolBooking\Products\ProductTypes;
-use CookingSchoolBooking\Products\VideoCourseProduct;
+use BookaClass\Products\ClassProduct;
+use BookaClass\Products\ProductTypes;
+use BookaClass\Products\VideoCourseProduct;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

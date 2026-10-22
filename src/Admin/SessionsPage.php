@@ -14,13 +14,13 @@
  * Security: every write is guarded by a nonce + manage_woocommerce cap check.
  * All DB reads use $wpdb->prepare(); outputs use esc_html/esc_attr/esc_url.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Support\Jalali;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Support\Jalali;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

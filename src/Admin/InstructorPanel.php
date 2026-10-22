@@ -19,12 +19,12 @@
  *   — Access the full bookings list.
  *   — Manage refunds, settings, or plugin config.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
-use CookingSchoolBooking\Services\AttendanceService;
+use BookaClass\Services\AttendanceService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -171,7 +171,7 @@ class InstructorPanel {
 						?>
 							<tr>
 								<td><?php echo esc_html( $s['class_title'] ); ?></td>
-								<td><?php echo esc_html( \CookingSchoolBooking\Support\Jalali::to_jalali_string( $s['start_at'] ) ); ?></td>
+								<td><?php echo esc_html( \BookaClass\Support\Jalali::to_jalali_string( $s['start_at'] ) ); ?></td>
 								<td><?php echo esc_html( (string) $s['max_capacity'] ); ?></td>
 								<td><?php echo esc_html( (string) $s['seats_taken'] ); ?></td>
 								<td>
@@ -227,7 +227,7 @@ class InstructorPanel {
 					<option value="0"><?php esc_html_e( '— انتخاب جلسه —', 'csb' ); ?></option>
 					<?php foreach ( $sessions as $s ) : ?>
 						<option value="<?php echo esc_attr( (string) $s['id'] ); ?>" <?php selected( $session_id, (int) $s['id'] ); ?>>
-							<?php echo esc_html( $s['class_title'] . ' — ' . \CookingSchoolBooking\Support\Jalali::to_jalali_string( $s['start_at'] ) ); ?>
+							<?php echo esc_html( $s['class_title'] . ' — ' . \BookaClass\Support\Jalali::to_jalali_string( $s['start_at'] ) ); ?>
 						</option>
 					<?php endforeach; ?>
 				</select>

@@ -10,13 +10,13 @@
  * On successful verify the WP user is created if their phone is not yet registered,
  * then wp_set_auth_cookie() is called so the session is immediately usable.
  *
- * @package CookingSchoolBooking\REST
+ * @package BookaClass\REST
  */
 
-namespace CookingSchoolBooking\REST;
+namespace BookaClass\REST;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\OtpService;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\OtpService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

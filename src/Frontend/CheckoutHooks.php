@@ -16,16 +16,16 @@
  *  — Checkout / order string relabelling.
  *  — Hide shipping fields for virtual-only carts.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Admin\SettingsPage;
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\CapacityService;
-use CookingSchoolBooking\Services\CouponService;
-use CookingSchoolBooking\Services\WalletService;
+use BookaClass\Admin\SettingsPage;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\CapacityService;
+use BookaClass\Services\CouponService;
+use BookaClass\Services\WalletService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -96,7 +96,7 @@ class CheckoutHooks {
 			$deposit_percent = (float) ( $settings['deposit_default_percent'] ?? 30 );
 
 			// Per-product override if the class has its own deposit_type meta.
-			/** @var \CookingSchoolBooking\Products\ClassProduct $product */
+			/** @var \BookaClass\Products\ClassProduct $product */
 			if ( method_exists( $product, 'get_csb_deposit_type' ) ) {
 				$dep_type  = $product->get_csb_deposit_type();
 				$dep_value = (float) $product->get_csb_deposit_value();

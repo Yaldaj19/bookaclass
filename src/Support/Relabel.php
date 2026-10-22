@@ -14,10 +14,10 @@
  * The mapping array is intentionally small and explicit — add entries here
  * rather than writing broad regex patterns.
  *
- * @package CookingSchoolBooking\Support
+ * @package BookaClass\Support
  */
 
-namespace CookingSchoolBooking\Support;
+namespace BookaClass\Support;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

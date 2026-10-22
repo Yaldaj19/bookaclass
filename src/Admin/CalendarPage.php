@@ -10,10 +10,10 @@
  * Sessions are loaded via a single prepared SQL query;
  * the Jalali helper converts UTC start_at to a (y, m, d) triple for placement.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,7 +45,7 @@ class CalendarPage {
 		}
 
 		// Determine current Jalali year/month from query-string or default to today.
-		[ $today_jy, $today_jm, ] = \CookingSchoolBooking\Support\Jalali::to_jalali(
+		[ $today_jy, $today_jm, ] = \BookaClass\Support\Jalali::to_jalali(
 			(int) gmdate( 'Y' ),
 			(int) gmdate( 'm' ),
 			(int) gmdate( 'd' )
@@ -70,9 +70,9 @@ class CalendarPage {
 		$next_url = add_query_arg( [ 'page' => 'csb-calendar', 'jy' => $next_jy, 'jm' => $next_jm ], admin_url( 'admin.php' ) );
 
 		// Gregorian range for this Jalali month (first + last day).
-		[ $g_start_y, $g_start_m, $g_start_d ] = \CookingSchoolBooking\Support\Jalali::to_gregorian( $jy, $jm, 1 );
-		$month_days = $jm <= 6 ? 31 : ( $jm <= 11 ? 30 : ( \CookingSchoolBooking\Support\Jalali::is_leap_year( $jy ) ? 30 : 29 ) );
-		[ $g_end_y, $g_end_m, $g_end_d ] = \CookingSchoolBooking\Support\Jalali::to_gregorian( $jy, $jm, $month_days );
+		[ $g_start_y, $g_start_m, $g_start_d ] = \BookaClass\Support\Jalali::to_gregorian( $jy, $jm, 1 );
+		$month_days = $jm <= 6 ? 31 : ( $jm <= 11 ? 30 : ( \BookaClass\Support\Jalali::is_leap_year( $jy ) ? 30 : 29 ) );
+		[ $g_end_y, $g_end_m, $g_end_d ] = \BookaClass\Support\Jalali::to_gregorian( $jy, $jm, $month_days );
 
 		$range_start = sprintf( '%04d-%02d-%02d 00:00:00', $g_start_y, $g_start_m, $g_start_d );
 		$range_end   = sprintf( '%04d-%02d-%02d 23:59:59', $g_end_y, $g_end_m, $g_end_d );
@@ -200,7 +200,7 @@ class CalendarPage {
 			$tz   = wp_timezone();
 			$dt   = $dt->setTimezone( $tz );
 			$gymd = explode( '-', $dt->format( 'Y-m-d' ) );
-			[ $jy2, $jm2, $jd ] = \CookingSchoolBooking\Support\Jalali::to_jalali(
+			[ $jy2, $jm2, $jd ] = \BookaClass\Support\Jalali::to_jalali(
 				(int) $gymd[0], (int) $gymd[1], (int) $gymd[2]
 			);
 

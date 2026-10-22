@@ -40,10 +40,10 @@
  * Security: register_setting + nonce + manage_woocommerce cap.
  * All colors sanitized through sanitize_hex_color(); numerics clamped.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

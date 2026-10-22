@@ -11,12 +11,12 @@
  * Balance order payment is handled by woocommerce_payment_complete in
  * OrderBooking, which calls BookingService::confirm_balance().
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
-use CookingSchoolBooking\Admin\SettingsPage;
+use BookaClass\Admin\SettingsPage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

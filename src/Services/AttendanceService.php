@@ -8,10 +8,10 @@
  * No-show also transitions the booking state machine via BookingService::transition()
  * so the audit trail is consistent.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

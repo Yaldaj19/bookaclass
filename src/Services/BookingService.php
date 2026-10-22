@@ -18,10 +18,10 @@
  * Phase 3 uses only: pending → fully_paid → confirmed.
  * The deposit_paid branch is wired in Phase 4.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

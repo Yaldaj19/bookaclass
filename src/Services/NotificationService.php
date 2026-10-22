@@ -8,10 +8,10 @@
  *
  * Built-in fallback: wp_mail() for email when no external adapter intercepts.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

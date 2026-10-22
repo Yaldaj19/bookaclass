@@ -15,13 +15,13 @@
  *   - Plugin activation
  *   - Config save (from ContentTypesPage)
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Admin\AppearancePage;
-use CookingSchoolBooking\Products\ProductTypes;
+use BookaClass\Admin\AppearancePage;
+use BookaClass\Products\ProductTypes;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -23,10 +23,10 @@
  * Security: nonce + manage_woocommerce cap on every write; all output escaped;
  *           all SQL via $wpdb->prepare(); sanitized before storing.
  *
- * @package CookingSchoolBooking\Admin
+ * @package BookaClass\Admin
  */
 
-namespace CookingSchoolBooking\Admin;
+namespace BookaClass\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

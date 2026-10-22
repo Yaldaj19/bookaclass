@@ -11,15 +11,15 @@
  *   4. Issue a refund request (auto-approved: system cancels = full refund).
  *   5. Add WC order note.
  *
- * @package CookingSchoolBooking\Cron
+ * @package BookaClass\Cron
  */
 
-namespace CookingSchoolBooking\Cron;
+namespace BookaClass\Cron;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\BookingService;
-use CookingSchoolBooking\Services\CapacityService;
-use CookingSchoolBooking\Services\RefundService;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\BookingService;
+use BookaClass\Services\CapacityService;
+use BookaClass\Services\RefundService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

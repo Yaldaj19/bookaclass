@@ -9,13 +9,13 @@
  *   1. Transitions the booking to 'completed'.
  *   2. Writes an audit log entry.
  *
- * @package CookingSchoolBooking\Cron
+ * @package BookaClass\Cron
  */
 
-namespace CookingSchoolBooking\Cron;
+namespace BookaClass\Cron;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\BookingService;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\BookingService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

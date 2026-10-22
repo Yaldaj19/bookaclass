@@ -5,10 +5,10 @@
  * Writes one row to wp_csb_audit_log for every sensitive action.
  * All parameters are parameterised — never interpolated into SQL.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -9,10 +9,10 @@
  * Certificate data is stored in wp_csb_certificates; the rendered HTML/PDF is
  * generated on demand from the template at templates/certificate.php.
  *
- * @package CookingSchoolBooking\Services
+ * @package BookaClass\Services
  */
 
-namespace CookingSchoolBooking\Services;
+namespace BookaClass\Services;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

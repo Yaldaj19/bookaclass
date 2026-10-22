@@ -14,13 +14,13 @@
  *
  * The threshold_hours (default 24) is configurable via csb_settings option.
  *
- * @package CookingSchoolBooking\Cron
+ * @package BookaClass\Cron
  */
 
-namespace CookingSchoolBooking\Cron;
+namespace BookaClass\Cron;
 
-use CookingSchoolBooking\Services\AuditLogger;
-use CookingSchoolBooking\Services\RefundService;
+use BookaClass\Services\AuditLogger;
+use BookaClass\Services\RefundService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -88,7 +88,7 @@ class MinToRunCron {
 				// BookingService::cancel() calls CapacityService::release_seat() internally
 				// for deposit_paid|fully_paid|confirmed bookings — no separate decrement needed.
 				try {
-					\CookingSchoolBooking\Services\BookingService::cancel(
+					\BookaClass\Services\BookingService::cancel(
 						$booking_id,
 						'min_to_run_not_met',
 						'',

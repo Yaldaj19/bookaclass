@@ -13,14 +13,14 @@
  *   — permission_callback enforces ownership / manage_woocommerce capability.
  *   — Responses: { success, data } or { success, error }.
  *
- * @package CookingSchoolBooking\REST
+ * @package BookaClass\REST
  */
 
-namespace CookingSchoolBooking\REST;
+namespace BookaClass\REST;
 
-use CookingSchoolBooking\Services\BookingService;
-use CookingSchoolBooking\Services\RefundService;
-use CookingSchoolBooking\Services\RescheduleService;
+use BookaClass\Services\BookingService;
+use BookaClass\Services\RefundService;
+use BookaClass\Services\RescheduleService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

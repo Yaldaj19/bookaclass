@@ -9,10 +9,10 @@
  * Storage: option `csb_slug_redirects` — array of
  *   [ 'old' => '/old-slug/', 'new' => '/new-slug/', 'added_at' => timestamp ]
  *
- * @package CookingSchoolBooking\Support
+ * @package BookaClass\Support
  */
 
-namespace CookingSchoolBooking\Support;
+namespace BookaClass\Support;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

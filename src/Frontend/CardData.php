@@ -10,12 +10,12 @@
  * Per-request in-memory caches (static arrays) prevent redundant queries
  * inside the loop.
  *
- * @package CookingSchoolBooking\Frontend
+ * @package BookaClass\Frontend
  */
 
-namespace CookingSchoolBooking\Frontend;
+namespace BookaClass\Frontend;
 
-use CookingSchoolBooking\Services\CapacityService;
+use BookaClass\Services\CapacityService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

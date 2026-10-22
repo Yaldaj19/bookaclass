@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       Cooking School Booking
+ * Plugin Name:       BookaClass
  * Plugin URI:        https://github.com/
- * Description:       یک افزونه‌ی WooCommerce برای رزرو کلاس‌ها و فروش ویدیوهای آموزشگاه آشپزی.
+ * Description:       رزرو کلاس حضوری/آنلاین زنده و فروش ویدیو کلاس روی WooCommerce — بیعانه، تسویه، کیف‌پول، پنل مدرس و سئو. جامع و حرفه‌ای.
  * Version:           0.5.0
  * Requires at least: 6.0
  * Requires PHP:      8.1
@@ -31,7 +31,7 @@ if ( file_exists( $composer_autoload ) ) {
 	require_once $composer_autoload;
 } else {
 	spl_autoload_register( function ( string $class ): void {
-		$prefix = 'CookingSchoolBooking\\';
+		$prefix = 'BookaClass\\';
 		$len    = strlen( $prefix );
 
 		if ( strncmp( $prefix, $class, $len ) !== 0 ) {
@@ -61,7 +61,7 @@ add_filter( 'cron_schedules', function ( array $schedules ): array {
 
 // ─── Activation / Deactivation ────────────────────────────────────────────────
 register_activation_hook( CSB_FILE, function (): void {
-	CookingSchoolBooking\Install\Migrator::install();
+	BookaClass\Install\Migrator::install();
 
 	// Schedule recurring crons if not already scheduled.
 	if ( ! wp_next_scheduled( 'csb_release_locks' ) ) {
@@ -108,5 +108,5 @@ register_deactivation_hook( CSB_FILE, function (): void {
 
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
 add_action( 'plugins_loaded', function (): void {
-	CookingSchoolBooking\Plugin::instance();
+	BookaClass\Plugin::instance();
 } );

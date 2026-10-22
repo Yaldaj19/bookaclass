@@ -5,10 +5,10 @@
  * All conversions are done without external libraries.
  * Storage: UTC. Display: Asia/Tehran.
  *
- * @package CookingSchoolBooking\Support
+ * @package BookaClass\Support
  */
 
-namespace CookingSchoolBooking\Support;
+namespace BookaClass\Support;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
