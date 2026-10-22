@@ -1855,3 +1855,11 @@
 .csb-breadcrumb__item a{color:var(--csb-muted);text-decoration:none;transition:color .15s;}
 .csb-breadcrumb__item a:hover{color:var(--csb-primary);}
 .csb-breadcrumb__item--current{color:var(--csb-text);font-weight:600;}
+
+/* sidebar: avoid cramped cards — drop to 2 cols in the narrower main column */
+.csb-archive__layout[data-sidebar="right"] .csb-cards[data-cols="3"],
+.csb-archive__layout[data-sidebar="left"] .csb-cards[data-cols="3"],
+.csb-archive__layout[data-sidebar="right"] .csb-cards[data-cols="4"],
+.csb-archive__layout[data-sidebar="left"] .csb-cards[data-cols="4"]{--cols:2;}
+.csb-archive__sidebar{font-family:var(--csb-font);}
+.csb-archive__sidebar .csb-sidebar-widget{margin-bottom:18px;}
