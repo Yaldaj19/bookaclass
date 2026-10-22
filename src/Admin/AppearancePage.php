@@ -1,6 +1,7 @@
 <?php
 /**
- * Appearance settings page — color tokens, radius, container, font, and presets.
+ * Appearance settings page — color tokens, radius, container, font,
+ * card layout, and archive layout options.
  *
  * Submenu: «آموزشگاه → ظاهر»
  * Option:  csb_style  (single flat array)
@@ -20,6 +21,21 @@
  *   radius_lg     --csb-radius-lg     (px, 0–40)
  *   container_max --csb-container     (px, 600–1600)
  *   font_family   --csb-font          (Vazirmatn | system)
+ *
+ * Card / archive layout keys:
+ *   card_style          classic | overlay | minimal | horizontal
+ *   archive_columns     2 | 3 | 4
+ *   archive_layout      grid | list
+ *   archive_width       boxed | full
+ *   archive_per_page    int
+ *   archive_sidebar     none | right | left
+ *   show_filters        bool
+ *   show_result_count   bool
+ *   card_show_image, card_show_category, card_show_instructor,
+ *   card_show_level, card_show_type_badge, card_show_next_session,
+ *   card_show_seats, card_show_rating, card_show_excerpt,
+ *   card_show_price, card_show_earlybird  (bool each)
+ *   card_cta_label      text
  *
  * Security: register_setting + nonce + manage_woocommerce cap.
  * All colors sanitized through sanitize_hex_color(); numerics clamped.
@@ -46,10 +62,11 @@ class AppearancePage {
 	/**
 	 * Default token values — warm cooking-school terracotta/orange palette.
 	 *
-	 * @return array<string,string|int>
+	 * @return array<string,mixed>
 	 */
 	public static function defaults(): array {
 		return [
+			// Colors & font.
 			'primary'       => '#c0392b',
 			'primary_hover' => '#a93226',
 			'accent'        => '#e67e22',
@@ -64,13 +81,41 @@ class AppearancePage {
 			'radius_lg'     => 14,
 			'container_max' => 1200,
 			'font_family'   => 'Vazirmatn',
+
+			// Card style.
+			'card_style'    => 'classic',
+
+			// Archive layout.
+			'archive_columns'   => 3,
+			'archive_layout'    => 'grid',
+			'archive_width'     => 'boxed',
+			'archive_per_page'  => 12,
+			'archive_sidebar'   => 'none',
+			'show_filters'      => true,
+			'show_result_count' => true,
+
+			// Card toggles (all true by default).
+			'card_show_image'        => true,
+			'card_show_category'     => true,
+			'card_show_instructor'   => true,
+			'card_show_level'        => true,
+			'card_show_type_badge'   => true,
+			'card_show_next_session' => true,
+			'card_show_seats'        => true,
+			'card_show_rating'       => true,
+			'card_show_excerpt'      => true,
+			'card_show_price'        => true,
+			'card_show_earlybird'    => true,
+
+			// Card CTA label.
+			'card_cta_label' => 'مشاهده و ثبت‌نام',
 		];
 	}
 
 	/**
 	 * Returns saved tokens merged with defaults.
 	 *
-	 * @return array<string,string|int>
+	 * @return array<string,mixed>
 	 */
 	public static function get(): array {
 		$saved = get_option( self::OPTION_KEY, [] );
@@ -221,7 +266,7 @@ class AppearancePage {
 	 * Sanitizes raw POST input for the csb_style option.
 	 *
 	 * @param  mixed $input
-	 * @return array<string,string|int>
+	 * @return array<string,mixed>
 	 */
 	public function sanitize( $input ): array {
 		$d = self::defaults();
@@ -230,27 +275,74 @@ class AppearancePage {
 			return $d;
 		}
 
+		$clean = [];
+
+		// ── Colors ────────────────────────────────────────────────────────────
 		$color_keys = [
 			'primary', 'primary_hover', 'accent',
 			'bg', 'surface', 'text', 'muted', 'border',
 			'success', 'danger',
 		];
-
-		$clean = [];
-
 		foreach ( $color_keys as $k ) {
 			$v = sanitize_hex_color( $input[ $k ] ?? '' );
 			$clean[ $k ] = $v ?: $d[ $k ];
 		}
 
+		// ── Numerics ──────────────────────────────────────────────────────────
 		$clean['radius']        = max( 0,   min( 24,   (int) ( $input['radius']        ?? $d['radius'] ) ) );
 		$clean['radius_lg']     = max( 0,   min( 40,   (int) ( $input['radius_lg']     ?? $d['radius_lg'] ) ) );
 		$clean['container_max'] = max( 600, min( 1600, (int) ( $input['container_max'] ?? $d['container_max'] ) ) );
+		$clean['archive_per_page'] = max( 1, min( 100, (int) ( $input['archive_per_page'] ?? $d['archive_per_page'] ) ) );
 
+		// ── Select: font_family ───────────────────────────────────────────────
 		$allowed_fonts = [ 'Vazirmatn', 'system' ];
 		$clean['font_family'] = in_array( $input['font_family'] ?? '', $allowed_fonts, true )
 			? $input['font_family']
 			: $d['font_family'];
+
+		// ── Select: card_style ────────────────────────────────────────────────
+		$allowed_card_styles = [ 'classic', 'overlay', 'minimal', 'horizontal' ];
+		$clean['card_style'] = in_array( $input['card_style'] ?? '', $allowed_card_styles, true )
+			? $input['card_style']
+			: $d['card_style'];
+
+		// ── Select: archive_columns ───────────────────────────────────────────
+		$allowed_cols = [ 2, 3, 4 ];
+		$clean['archive_columns'] = in_array( (int) ( $input['archive_columns'] ?? 0 ), $allowed_cols, true )
+			? (int) $input['archive_columns']
+			: $d['archive_columns'];
+
+		// ── Select: archive_layout ────────────────────────────────────────────
+		$clean['archive_layout'] = in_array( $input['archive_layout'] ?? '', [ 'grid', 'list' ], true )
+			? $input['archive_layout']
+			: $d['archive_layout'];
+
+		// ── Select: archive_width ─────────────────────────────────────────────
+		$clean['archive_width'] = in_array( $input['archive_width'] ?? '', [ 'boxed', 'full' ], true )
+			? $input['archive_width']
+			: $d['archive_width'];
+
+		// ── Select: archive_sidebar ───────────────────────────────────────────
+		$clean['archive_sidebar'] = in_array( $input['archive_sidebar'] ?? '', [ 'none', 'right', 'left' ], true )
+			? $input['archive_sidebar']
+			: $d['archive_sidebar'];
+
+		// ── Booleans ──────────────────────────────────────────────────────────
+		$bool_keys = [
+			'show_filters', 'show_result_count',
+			'card_show_image', 'card_show_category', 'card_show_instructor',
+			'card_show_level', 'card_show_type_badge', 'card_show_next_session',
+			'card_show_seats', 'card_show_rating', 'card_show_excerpt',
+			'card_show_price', 'card_show_earlybird',
+		];
+		foreach ( $bool_keys as $k ) {
+			// Checkbox: present = true, absent = false.
+			$clean[ $k ] = ! empty( $input[ $k ] );
+		}
+
+		// ── Text: card_cta_label ──────────────────────────────────────────────
+		$cta = sanitize_text_field( $input['card_cta_label'] ?? '' );
+		$clean['card_cta_label'] = '' !== $cta ? $cta : $d['card_cta_label'];
 
 		return $clean;
 	}
@@ -266,7 +358,6 @@ class AppearancePage {
 		$presets = self::presets();
 		$saved   = ! empty( $_GET['csb_saved'] );
 
-		// Color fields: token key => label.
 		$color_fields = [
 			'primary'       => __( 'رنگ اصلی (دکمه‌ها)', 'csb' ),
 			'primary_hover' => __( 'رنگ اصلی — حالت hover', 'csb' ),
@@ -279,6 +370,10 @@ class AppearancePage {
 			'success'       => __( 'رنگ موفقیت (success)', 'csb' ),
 			'danger'        => __( 'رنگ خطر / هشدار (danger)', 'csb' ),
 		];
+
+		$bool_to_checked = static function ( $key ) use ( $style ): string {
+			return ! empty( $style[ $key ] ) ? ' checked' : '';
+		};
 		?>
 		<div class="wrap" dir="rtl">
 			<h1><?php esc_html_e( 'ظاهر آموزشگاه', 'csb' ); ?></h1>
@@ -306,117 +401,364 @@ class AppearancePage {
 				<?php endforeach; ?>
 				</div>
 				<p class="description" style="margin-top:.4em;">
-					<?php esc_html_e( 'پریست فقط فیلدها را پر می‌کند — برای ذخیره «ذخیره ظاهر» را بزنید.', 'csb' ); ?>
+					<?php esc_html_e( 'پریست فقط فیلدهای رنگ/فونت را پر می‌کند — برای ذخیره «ذخیره ظاهر» را بزنید.', 'csb' ); ?>
 				</p>
+			</div>
+
+			<!-- Tab nav -->
+			<div id="csb-ap-tabs" style="margin-bottom:1em;">
+				<style>
+				.csb-ap-tab-nav{display:flex;gap:0;border-bottom:2px solid #c3c4c7;margin-bottom:1.5em;list-style:none;padding:0;}
+				.csb-ap-tab-nav li{margin:0;}
+				.csb-ap-tab-nav a{display:inline-block;padding:.5em 1.2em;text-decoration:none;color:#1d2327;border:2px solid transparent;border-bottom:none;margin-bottom:-2px;font-size:13px;}
+				.csb-ap-tab-nav a[aria-selected="true"]{background:#fff;border-color:#c3c4c7;border-bottom-color:#fff;font-weight:600;}
+				.csb-ap-tab-panel{display:none;}
+				.csb-ap-tab-panel.csb-ap-active{display:block;}
+				</style>
+				<ul class="csb-ap-tab-nav" role="tablist" aria-label="<?php esc_attr_e( 'بخش‌های ظاهر', 'csb' ); ?>">
+					<li role="presentation">
+						<a href="#csb-tab-colors" role="tab" aria-selected="true" id="csb-tab-btn-colors">
+							<?php esc_html_e( 'رنگ‌ها و فونت', 'csb' ); ?>
+						</a>
+					</li>
+					<li role="presentation">
+						<a href="#csb-tab-cards" role="tab" aria-selected="false" id="csb-tab-btn-cards">
+							<?php esc_html_e( 'کارت‌ها', 'csb' ); ?>
+						</a>
+					</li>
+					<li role="presentation">
+						<a href="#csb-tab-archive" role="tab" aria-selected="false" id="csb-tab-btn-archive">
+							<?php esc_html_e( 'آرشیو', 'csb' ); ?>
+						</a>
+					</li>
+					<li role="presentation">
+						<a href="#csb-tab-general" role="tab" aria-selected="false" id="csb-tab-btn-general">
+							<?php esc_html_e( 'عمومی', 'csb' ); ?>
+						</a>
+					</li>
+				</ul>
 			</div>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<?php wp_nonce_field( 'csb_appearance_save' ); ?>
 				<input type="hidden" name="action" value="csb_appearance_save">
 
-				<table class="form-table" role="presentation">
+				<!-- ══════════════════════════════════════════════════════════════
+				     TAB 1: رنگ‌ها و فونت
+				     ══════════════════════════════════════════════════════════ -->
+				<div id="csb-tab-colors" class="csb-ap-tab-panel csb-ap-active" role="tabpanel" aria-labelledby="csb-tab-btn-colors">
+					<table class="form-table" role="presentation">
 
-					<!-- Color pickers -->
-					<?php foreach ( $color_fields as $key => $label ) : ?>
-					<tr>
-						<th scope="row">
-							<label for="csb_ap_<?php echo esc_attr( $key ); ?>">
-								<?php echo esc_html( $label ); ?>
-							</label>
-						</th>
-						<td>
-							<input
-								type="text"
-								id="csb_ap_<?php echo esc_attr( $key ); ?>"
-								name="<?php echo esc_attr( self::OPTION_KEY ); ?>[<?php echo esc_attr( $key ); ?>]"
-								value="<?php echo esc_attr( (string) $style[ $key ] ); ?>"
-								class="csb-color-picker"
-								data-default-color="<?php echo esc_attr( (string) self::defaults()[ $key ] ); ?>"
-							/>
-						</td>
-					</tr>
-					<?php endforeach; ?>
+						<?php foreach ( $color_fields as $key => $label ) : ?>
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_<?php echo esc_attr( $key ); ?>">
+									<?php echo esc_html( $label ); ?>
+								</label>
+							</th>
+							<td>
+								<input
+									type="text"
+									id="csb_ap_<?php echo esc_attr( $key ); ?>"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[<?php echo esc_attr( $key ); ?>]"
+									value="<?php echo esc_attr( (string) $style[ $key ] ); ?>"
+									class="csb-color-picker"
+									data-default-color="<?php echo esc_attr( (string) self::defaults()[ $key ] ); ?>"
+								/>
+							</td>
+						</tr>
+						<?php endforeach; ?>
 
-					<!-- radius -->
-					<tr>
-						<th scope="row">
-							<label for="csb_ap_radius">
-								<?php esc_html_e( 'گردی گوشه (radius — پیکسل)', 'csb' ); ?>
-							</label>
-						</th>
-						<td>
-							<input
-								type="number"
-								id="csb_ap_radius"
-								name="<?php echo esc_attr( self::OPTION_KEY ); ?>[radius]"
-								value="<?php echo esc_attr( (string) $style['radius'] ); ?>"
-								min="0" max="24" class="small-text"
-							/>
-							<span class="description">0–24 px</span>
-						</td>
-					</tr>
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_radius">
+									<?php esc_html_e( 'گردی گوشه (radius — پیکسل)', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<input
+									type="number"
+									id="csb_ap_radius"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[radius]"
+									value="<?php echo esc_attr( (string) $style['radius'] ); ?>"
+									min="0" max="24" class="small-text"
+								/>
+								<span class="description">0–24 px</span>
+							</td>
+						</tr>
 
-					<!-- radius_lg -->
-					<tr>
-						<th scope="row">
-							<label for="csb_ap_radius_lg">
-								<?php esc_html_e( 'گردی گوشه بزرگ (radius-lg — پیکسل)', 'csb' ); ?>
-							</label>
-						</th>
-						<td>
-							<input
-								type="number"
-								id="csb_ap_radius_lg"
-								name="<?php echo esc_attr( self::OPTION_KEY ); ?>[radius_lg]"
-								value="<?php echo esc_attr( (string) $style['radius_lg'] ); ?>"
-								min="0" max="40" class="small-text"
-							/>
-							<span class="description">0–40 px</span>
-						</td>
-					</tr>
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_radius_lg">
+									<?php esc_html_e( 'گردی گوشه بزرگ (radius-lg — پیکسل)', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<input
+									type="number"
+									id="csb_ap_radius_lg"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[radius_lg]"
+									value="<?php echo esc_attr( (string) $style['radius_lg'] ); ?>"
+									min="0" max="40" class="small-text"
+								/>
+								<span class="description">0–40 px</span>
+							</td>
+						</tr>
 
-					<!-- container_max -->
-					<tr>
-						<th scope="row">
-							<label for="csb_ap_container_max">
-								<?php esc_html_e( 'عرض حداکثر محتوا (container — پیکسل)', 'csb' ); ?>
-							</label>
-						</th>
-						<td>
-							<input
-								type="number"
-								id="csb_ap_container_max"
-								name="<?php echo esc_attr( self::OPTION_KEY ); ?>[container_max]"
-								value="<?php echo esc_attr( (string) $style['container_max'] ); ?>"
-								min="600" max="1600" step="20" class="small-text"
-							/>
-							<span class="description">600–1600 px</span>
-						</td>
-					</tr>
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_container_max">
+									<?php esc_html_e( 'عرض حداکثر محتوا (container — پیکسل)', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<input
+									type="number"
+									id="csb_ap_container_max"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[container_max]"
+									value="<?php echo esc_attr( (string) $style['container_max'] ); ?>"
+									min="600" max="1600" step="20" class="small-text"
+								/>
+								<span class="description">600–1600 px</span>
+							</td>
+						</tr>
 
-					<!-- font_family -->
-					<tr>
-						<th scope="row">
-							<label for="csb_ap_font_family">
-								<?php esc_html_e( 'فونت', 'csb' ); ?>
-							</label>
-						</th>
-						<td>
-							<select
-								id="csb_ap_font_family"
-								name="<?php echo esc_attr( self::OPTION_KEY ); ?>[font_family]"
-							>
-								<option value="Vazirmatn" <?php selected( $style['font_family'], 'Vazirmatn' ); ?>>
-									Vazirmatn (پیش‌فرض)
-								</option>
-								<option value="system" <?php selected( $style['font_family'], 'system' ); ?>>
-									<?php esc_html_e( 'فونت سیستم', 'csb' ); ?>
-								</option>
-							</select>
-						</td>
-					</tr>
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_font_family">
+									<?php esc_html_e( 'فونت', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<select
+									id="csb_ap_font_family"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[font_family]"
+								>
+									<option value="Vazirmatn" <?php selected( $style['font_family'], 'Vazirmatn' ); ?>>
+										Vazirmatn (<?php esc_html_e( 'پیش‌فرض', 'csb' ); ?>)
+									</option>
+									<option value="system" <?php selected( $style['font_family'], 'system' ); ?>>
+										<?php esc_html_e( 'فونت سیستم', 'csb' ); ?>
+									</option>
+								</select>
+							</td>
+						</tr>
 
-				</table>
+					</table>
+				</div><!-- /tab-colors -->
+
+				<!-- ══════════════════════════════════════════════════════════════
+				     TAB 2: کارت‌ها
+				     ══════════════════════════════════════════════════════════ -->
+				<div id="csb-tab-cards" class="csb-ap-tab-panel" role="tabpanel" aria-labelledby="csb-tab-btn-cards">
+					<table class="form-table" role="presentation">
+
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_card_style">
+									<?php esc_html_e( 'سبک کارت', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<select
+									id="csb_ap_card_style"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[card_style]"
+								>
+									<option value="classic"    <?php selected( $style['card_style'], 'classic' ); ?>><?php esc_html_e( 'کلاسیک', 'csb' ); ?></option>
+									<option value="overlay"    <?php selected( $style['card_style'], 'overlay' ); ?>><?php esc_html_e( 'Overlay (متن روی تصویر)', 'csb' ); ?></option>
+									<option value="minimal"    <?php selected( $style['card_style'], 'minimal' ); ?>><?php esc_html_e( 'مینیمال', 'csb' ); ?></option>
+									<option value="horizontal" <?php selected( $style['card_style'], 'horizontal' ); ?>><?php esc_html_e( 'افقی', 'csb' ); ?></option>
+								</select>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_card_cta_label">
+									<?php esc_html_e( 'متن دکمه کارت', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<input
+									type="text"
+									id="csb_ap_card_cta_label"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[card_cta_label]"
+									value="<?php echo esc_attr( (string) $style['card_cta_label'] ); ?>"
+									class="regular-text"
+								/>
+							</td>
+						</tr>
+
+						<?php
+						$card_toggles = [
+							'card_show_image'        => __( 'نمایش تصویر', 'csb' ),
+							'card_show_category'     => __( 'نمایش دسته‌بندی', 'csb' ),
+							'card_show_instructor'   => __( 'نمایش نام مدرس', 'csb' ),
+							'card_show_level'        => __( 'نمایش سطح دوره', 'csb' ),
+							'card_show_type_badge'   => __( 'نمایش نشان نوع (حضوری/آنلاین/ویدیویی)', 'csb' ),
+							'card_show_next_session' => __( 'نمایش تاریخ جلسه بعدی (کلاس)', 'csb' ),
+							'card_show_seats'        => __( 'نمایش ظرفیت خالی', 'csb' ),
+							'card_show_rating'       => __( 'نمایش امتیاز', 'csb' ),
+							'card_show_excerpt'      => __( 'نمایش توضیح کوتاه', 'csb' ),
+							'card_show_price'        => __( 'نمایش قیمت', 'csb' ),
+							'card_show_earlybird'    => __( 'نمایش قیمت ثبت‌نام زودهنگام (در صورت فعال بودن)', 'csb' ),
+						];
+						?>
+
+						<?php foreach ( $card_toggles as $key => $label ) : ?>
+						<tr>
+							<th scope="row"><?php echo esc_html( $label ); ?></th>
+							<td>
+								<label>
+									<input
+										type="checkbox"
+										name="<?php echo esc_attr( self::OPTION_KEY ); ?>[<?php echo esc_attr( $key ); ?>]"
+										value="1"
+										<?php echo $bool_to_checked( $key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+									/>
+									<?php esc_html_e( 'فعال', 'csb' ); ?>
+								</label>
+							</td>
+						</tr>
+						<?php endforeach; ?>
+
+					</table>
+				</div><!-- /tab-cards -->
+
+				<!-- ══════════════════════════════════════════════════════════════
+				     TAB 3: آرشیو
+				     ══════════════════════════════════════════════════════════ -->
+				<div id="csb-tab-archive" class="csb-ap-tab-panel" role="tabpanel" aria-labelledby="csb-tab-btn-archive">
+					<table class="form-table" role="presentation">
+
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_archive_columns">
+									<?php esc_html_e( 'تعداد ستون‌ها', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<select
+									id="csb_ap_archive_columns"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[archive_columns]"
+								>
+									<option value="2" <?php selected( (int) $style['archive_columns'], 2 ); ?>>2</option>
+									<option value="3" <?php selected( (int) $style['archive_columns'], 3 ); ?>>3</option>
+									<option value="4" <?php selected( (int) $style['archive_columns'], 4 ); ?>>4</option>
+								</select>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_archive_layout">
+									<?php esc_html_e( 'چیدمان', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<select
+									id="csb_ap_archive_layout"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[archive_layout]"
+								>
+									<option value="grid" <?php selected( $style['archive_layout'], 'grid' ); ?>><?php esc_html_e( 'شبکه (grid)', 'csb' ); ?></option>
+									<option value="list" <?php selected( $style['archive_layout'], 'list' ); ?>><?php esc_html_e( 'لیست', 'csb' ); ?></option>
+								</select>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_archive_width">
+									<?php esc_html_e( 'عرض صفحه آرشیو', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<select
+									id="csb_ap_archive_width"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[archive_width]"
+								>
+									<option value="boxed" <?php selected( $style['archive_width'], 'boxed' ); ?>><?php esc_html_e( 'محدود (boxed)', 'csb' ); ?></option>
+									<option value="full"  <?php selected( $style['archive_width'], 'full' ); ?>><?php esc_html_e( 'تمام‌عرض (full)', 'csb' ); ?></option>
+								</select>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_archive_per_page">
+									<?php esc_html_e( 'تعداد دوره در هر صفحه', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<input
+									type="number"
+									id="csb_ap_archive_per_page"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[archive_per_page]"
+									value="<?php echo esc_attr( (string) $style['archive_per_page'] ); ?>"
+									min="1" max="100" class="small-text"
+								/>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row">
+								<label for="csb_ap_archive_sidebar">
+									<?php esc_html_e( 'سایدبار', 'csb' ); ?>
+								</label>
+							</th>
+							<td>
+								<select
+									id="csb_ap_archive_sidebar"
+									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[archive_sidebar]"
+								>
+									<option value="none"  <?php selected( $style['archive_sidebar'], 'none' ); ?>><?php esc_html_e( 'بدون سایدبار', 'csb' ); ?></option>
+									<option value="right" <?php selected( $style['archive_sidebar'], 'right' ); ?>><?php esc_html_e( 'راست', 'csb' ); ?></option>
+									<option value="left"  <?php selected( $style['archive_sidebar'], 'left' ); ?>><?php esc_html_e( 'چپ', 'csb' ); ?></option>
+								</select>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row"><?php esc_html_e( 'نمایش فیلترها', 'csb' ); ?></th>
+							<td>
+								<label>
+									<input
+										type="checkbox"
+										name="<?php echo esc_attr( self::OPTION_KEY ); ?>[show_filters]"
+										value="1"
+										<?php echo $bool_to_checked( 'show_filters' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+									/>
+									<?php esc_html_e( 'فعال', 'csb' ); ?>
+								</label>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row"><?php esc_html_e( 'نمایش تعداد نتایج', 'csb' ); ?></th>
+							<td>
+								<label>
+									<input
+										type="checkbox"
+										name="<?php echo esc_attr( self::OPTION_KEY ); ?>[show_result_count]"
+										value="1"
+										<?php echo $bool_to_checked( 'show_result_count' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+									/>
+									<?php esc_html_e( 'فعال', 'csb' ); ?>
+								</label>
+							</td>
+						</tr>
+
+					</table>
+				</div><!-- /tab-archive -->
+
+				<!-- ══════════════════════════════════════════════════════════════
+				     TAB 4: عمومی
+				     ══════════════════════════════════════════════════════════ -->
+				<div id="csb-tab-general" class="csb-ap-tab-panel" role="tabpanel" aria-labelledby="csb-tab-btn-general">
+					<p class="description" style="margin-top:1em;">
+						<?php esc_html_e( 'تنظیمات عمومی در نسخه‌های بعدی اضافه می‌شوند.', 'csb' ); ?>
+					</p>
+				</div><!-- /tab-general -->
 
 				<?php submit_button( esc_html__( 'ذخیره ظاهر', 'csb' ), 'primary', 'submit', true ); ?>
 			</form>
@@ -424,7 +766,31 @@ class AppearancePage {
 
 		<script>
 		(function () {
-			// Color token keys that map to input IDs.
+			// ── Tab switching ──────────────────────────────────────────────────
+			var tabs = document.querySelectorAll('.csb-ap-tab-nav a');
+			var panels = document.querySelectorAll('.csb-ap-tab-panel');
+
+			function activateTab(href) {
+				tabs.forEach(function(a) {
+					a.setAttribute('aria-selected', a.getAttribute('href') === href ? 'true' : 'false');
+				});
+				panels.forEach(function(p) {
+					if ('#' + p.id === href) {
+						p.classList.add('csb-ap-active');
+					} else {
+						p.classList.remove('csb-ap-active');
+					}
+				});
+			}
+
+			tabs.forEach(function(a) {
+				a.addEventListener('click', function(e) {
+					e.preventDefault();
+					activateTab(a.getAttribute('href'));
+				});
+			});
+
+			// ── Preset buttons ─────────────────────────────────────────────────
 			var colorKeys = [
 				'primary','primary_hover','accent',
 				'bg','surface','text','muted','border','success','danger'
@@ -440,7 +806,6 @@ class AppearancePage {
 						var el = document.getElementById('csb_ap_' + k);
 						if (!el) { return; }
 						el.value = preset[k];
-						// Refresh wp-color-picker iris widget if active.
 						if (typeof jQuery !== 'undefined' && jQuery(el).hasClass('wp-color-picker')) {
 							jQuery(el).wpColorPicker('color', preset[k]);
 						}

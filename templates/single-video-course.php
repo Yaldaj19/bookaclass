@@ -71,9 +71,21 @@ $rest_nonce    = wp_create_nonce( 'wp_rest' );
 
 		<!-- ── Hero ── -->
 		<header class="csb-hero">
-			<?php if ( $image ) : ?>
-				<div class="csb-hero__thumb"><?php echo $image; ?></div>
-			<?php endif; ?>
+			<?php
+			// Hero image: featured thumbnail or emoji placeholder.
+			use CookingSchoolBooking\Frontend\CardData;
+			$_hero_cat   = CardData::category_name( $post_id );
+			$_hero_emoji = CardData::emoji_for_category( $_hero_cat );
+			?>
+			<div class="csb-hero__thumb">
+				<?php if ( $image ) : ?>
+					<?php echo $image; // wp_get_attachment_image — already safe ?>
+				<?php else : ?>
+					<span class="csb-card__placeholder csb-hero__placeholder" data-cat="<?php echo esc_attr( $_hero_cat ); ?>">
+						<?php echo esc_html( $_hero_emoji ); ?>
+					</span>
+				<?php endif; ?>
+			</div>
 			<div class="csb-hero__body">
 				<h1 class="csb-hero__title" itemprop="name"><?php echo esc_html( $title ); ?></h1>
 				<ul class="csb-meta-list" role="list">

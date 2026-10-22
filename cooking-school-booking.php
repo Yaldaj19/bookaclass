@@ -3,7 +3,7 @@
  * Plugin Name:       Cooking School Booking
  * Plugin URI:        https://github.com/
  * Description:       یک افزونه‌ی WooCommerce برای رزرو کلاس‌ها و فروش ویدیوهای آموزشگاه آشپزی.
- * Version:           0.3.0
+ * Version:           0.4.0
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Author:            Developer
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-define( 'CSB_VERSION',    '0.3.0' );
+define( 'CSB_VERSION',    '0.4.0' );
 define( 'CSB_DB_VERSION', 5 );
 define( 'CSB_FILE',       __FILE__ );
 define( 'CSB_PATH',       plugin_dir_path( __FILE__ ) );

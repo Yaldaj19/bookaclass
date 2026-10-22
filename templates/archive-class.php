@@ -5,75 +5,348 @@
  * Loaded by Rewrites::maybe_load_template() when csb_archive=1 and
  * csb_product_type=class.
  *
+ * Layout, toggles, and per-page count are driven by AppearancePage::get().
+ * Card data (sessions, instructor, category) comes from CardData helpers.
+ * All prices are formatted with wc_price() so WooCommerce currency settings apply.
+ *
  * @package CookingSchoolBooking
  */
 
 defined( 'ABSPATH' ) || exit;
 
+use CookingSchoolBooking\Admin\AppearancePage;
+use CookingSchoolBooking\Frontend\CardData;
+use CookingSchoolBooking\Support\Jalali;
+
 get_header( 'shop' );
 
 $seo_config    = (array) get_option( 'csb_seo_config', [] );
 $archive_title = $seo_config['type_class']['archive_title'] ?? __( 'کلاس‌های آموزشی', 'csb' );
-$archive_desc  = $seo_config['type_class']['archive_desc'] ?? '';
+
+$s               = AppearancePage::get();
+$archive_width   = in_array( $s['archive_width'], [ 'boxed', 'full' ], true ) ? $s['archive_width'] : 'boxed';
+$archive_sidebar = in_array( $s['archive_sidebar'], [ 'none', 'right', 'left' ], true ) ? $s['archive_sidebar'] : 'none';
+$archive_layout  = in_array( $s['archive_layout'], [ 'grid', 'list' ], true ) ? $s['archive_layout'] : 'grid';
+$archive_columns = in_array( (int) $s['archive_columns'], [ 2, 3, 4 ], true ) ? (int) $s['archive_columns'] : 3;
+$card_style      = in_array( $s['card_style'], [ 'classic', 'overlay', 'minimal', 'horizontal' ], true ) ? $s['card_style'] : 'classic';
+$show_filters    = ! empty( $s['show_filters'] );
+$show_count      = ! empty( $s['show_result_count'] );
+$card_cta_label  = esc_html( sanitize_text_field( $s['card_cta_label'] ?: __( 'مشاهده و ثبت‌نام', 'csb' ) ) );
+
+// Active category / type filters from URL.
+$active_cat  = sanitize_title( (string) ( $_GET['csb_cat']  ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$active_type = sanitize_key(   (string) ( $_GET['csb_type'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+// All product_cat terms for filter chips.
+$archive_terms = get_terms( [
+	'taxonomy'   => 'product_cat',
+	'hide_empty' => true,
+	'exclude'    => get_term_by( 'slug', 'uncategorized', 'product_cat' ) ? get_term_by( 'slug', 'uncategorized', 'product_cat' )->term_id : 0,
+] );
+$archive_terms = is_wp_error( $archive_terms ) ? [] : $archive_terms;
+
+// Current archive URL base (without filter params).
+$archive_base_url = get_post_type_archive_link( 'product' ) ?: get_home_url( null, 'classes/' );
 ?>
 
-<main id="main" class="csb-main csb-archive-classes" role="main" dir="rtl">
+<section class="csb csb-main csb-archive csb-archive--<?php echo esc_attr( $archive_width ); ?>" dir="rtl" role="main">
 
-	<header class="csb-archive-header">
-		<h1 class="csb-archive-header__title"><?php echo esc_html( $archive_title ); ?></h1>
-		<?php if ( $archive_desc ) : ?>
-			<p class="csb-archive-header__desc"><?php echo esc_html( $archive_desc ); ?></p>
+	<header class="csb-archive__header">
+		<h1 class="csb-archive__title"><?php echo esc_html( $archive_title ); ?></h1>
+		<?php if ( $show_count && have_posts() ) : ?>
+			<p class="csb-archive__count">
+				<?php
+				$found = $GLOBALS['wp_query']->found_posts;
+				/* translators: %d: course count */
+				printf( esc_html( _n( '%d دوره', '%d دوره', $found, 'csb' ) ), (int) $found );
+				?>
+			</p>
 		<?php endif; ?>
 	</header>
 
-	<?php if ( have_posts() ) : ?>
-		<section class="csb-product-grid" aria-label="<?php esc_attr_e( 'لیست کلاس‌ها', 'csb' ); ?>">
-			<?php while ( have_posts() ) : the_post();
-				$product = wc_get_product( get_the_ID() );
-				if ( ! $product ) continue;
-				$image_id = (int) get_post_thumbnail_id();
-				$img      = $image_id ? wp_get_attachment_image( $image_id, 'medium', false, [
-					'loading' => 'lazy', 'alt' => esc_attr( get_the_title() ),
-				] ) : '';
-			?>
-				<article id="product-<?php the_ID(); ?>" <?php post_class( 'csb-card' ); ?> itemscope itemtype="https://schema.org/Course">
-					<a href="<?php echo esc_url( get_permalink() ); ?>" class="csb-card__link" tabindex="0">
-						<?php if ( $img ) : ?>
-							<div class="csb-card__thumb"><?php echo $img; ?></div>
-						<?php endif; ?>
-						<div class="csb-card__body">
-							<h2 class="csb-card__title" itemprop="name"><?php the_title(); ?></h2>
-							<?php
-							// Star rating — shown when the product has at least one approved review.
-							$rating_count = (int) $product->get_rating_count();
-							$avg_rating   = (float) $product->get_average_rating();
-							if ( $rating_count > 0 ) :
-							?>
-							<div class="csb-card__rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"
-								aria-label="<?php echo esc_attr( sprintf( __( '%1$.1f از ۵ — %2$d نظر', 'csb' ), $avg_rating, $rating_count ) ); ?>">
-								<?php echo wc_get_rating_html( $avg_rating, $rating_count ); ?>
-								<span class="csb-card__rating-count">(<?php echo esc_html( (string) $rating_count ); ?>)</span>
-								<meta itemprop="ratingValue" content="<?php echo esc_attr( number_format( $avg_rating, 1, '.', '' ) ); ?>">
-								<meta itemprop="reviewCount" content="<?php echo esc_attr( (string) $rating_count ); ?>">
-							</div>
-							<?php endif; ?>
-							<div class="csb-card__excerpt"><?php echo wp_kses_post( $product->get_short_description() ?: '' ); ?></div>
-							<div class="csb-card__price"><?php echo wp_kses_post( $product->get_price_html() ); ?></div>
-						</div>
+	<div class="csb-archive__layout" data-sidebar="<?php echo esc_attr( $archive_sidebar ); ?>">
+
+		<?php if ( 'none' !== $archive_sidebar ) : ?>
+		<aside class="csb-archive__sidebar" aria-label="<?php esc_attr_e( 'فیلتر و دسته‌بندی', 'csb' ); ?>">
+
+			<?php if ( is_active_sidebar( 'csb-archive-sidebar' ) ) : ?>
+				<div class="csb-archive__sidebar-widgets">
+					<?php dynamic_sidebar( 'csb-archive-sidebar' ); ?>
+				</div>
+			<?php endif; ?>
+
+			<?php if ( ! empty( $archive_terms ) ) : ?>
+			<div class="csb-archive__sidebar-cats">
+				<h3 class="csb-archive__sidebar-heading"><?php esc_html_e( 'دسته‌بندی', 'csb' ); ?></h3>
+				<ul class="csb-archive__cat-list">
+					<li>
+						<a href="<?php echo esc_url( $archive_base_url ); ?>"
+							<?php echo '' === $active_cat ? ' aria-current="page"' : ''; ?>>
+							<?php esc_html_e( 'همه', 'csb' ); ?>
+						</a>
+					</li>
+					<?php foreach ( $archive_terms as $term ) : ?>
+					<li>
+						<a href="<?php echo esc_url( add_query_arg( 'csb_cat', $term->slug, $archive_base_url ) ); ?>"
+							<?php echo $active_cat === $term->slug ? ' aria-current="page"' : ''; ?>>
+							<?php echo esc_html( $term->name ); ?>
+							<span class="csb-archive__cat-count">(<?php echo esc_html( (string) $term->count ); ?>)</span>
+						</a>
+					</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+			<?php endif; ?>
+
+			<div class="csb-archive__sidebar-types">
+				<h3 class="csb-archive__sidebar-heading"><?php esc_html_e( 'نوع برگزاری', 'csb' ); ?></h3>
+				<ul class="csb-archive__type-list">
+					<li>
+						<a href="<?php echo esc_url( $archive_base_url ); ?>"
+							<?php echo '' === $active_type ? ' aria-current="page"' : ''; ?>>
+							<?php esc_html_e( 'همه', 'csb' ); ?>
+						</a>
+					</li>
+					<li>
+						<a href="<?php echo esc_url( add_query_arg( 'csb_type', 'in_person', $archive_base_url ) ); ?>"
+							<?php echo 'in_person' === $active_type ? ' aria-current="page"' : ''; ?>>
+							<?php esc_html_e( 'حضوری', 'csb' ); ?>
+						</a>
+					</li>
+					<li>
+						<a href="<?php echo esc_url( add_query_arg( 'csb_type', 'online', $archive_base_url ) ); ?>"
+							<?php echo 'online' === $active_type ? ' aria-current="page"' : ''; ?>>
+							<?php esc_html_e( 'آنلاین', 'csb' ); ?>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+		</aside>
+		<?php endif; ?>
+
+		<div class="csb-archive__main">
+
+			<?php if ( $show_filters ) : ?>
+			<nav class="csb-archive__filters" aria-label="<?php esc_attr_e( 'فیلترها', 'csb' ); ?>">
+
+				<div class="csb-archive__filter-group csb-archive__filter-cats">
+					<a class="csb-filter-chip <?php echo '' === $active_cat ? 'csb-filter-chip--active' : ''; ?>"
+						href="<?php echo esc_url( $archive_base_url ); ?>"
+						<?php echo '' === $active_cat ? 'aria-current="page"' : ''; ?>>
+						<?php esc_html_e( 'همه', 'csb' ); ?>
 					</a>
-				</article>
-			<?php endwhile; ?>
-		</section>
+					<?php foreach ( $archive_terms as $term ) : ?>
+					<a class="csb-filter-chip <?php echo $active_cat === $term->slug ? 'csb-filter-chip--active' : ''; ?>"
+						href="<?php echo esc_url( add_query_arg( 'csb_cat', $term->slug, $archive_base_url ) ); ?>"
+						<?php echo $active_cat === $term->slug ? 'aria-current="page"' : ''; ?>>
+						<?php echo esc_html( $term->name ); ?>
+					</a>
+					<?php endforeach; ?>
+				</div>
 
-		<?php the_posts_pagination( [
-			'prev_text' => esc_html__( '&laquo; قبلی', 'csb' ),
-			'next_text' => esc_html__( 'بعدی &raquo;', 'csb' ),
-		] ); ?>
+				<div class="csb-archive__filter-group csb-archive__filter-types">
+					<a class="csb-filter-chip <?php echo '' === $active_type ? 'csb-filter-chip--active' : ''; ?>"
+						href="<?php echo esc_url( $archive_base_url ); ?>"
+						<?php echo '' === $active_type ? 'aria-current="page"' : ''; ?>>
+						<?php esc_html_e( 'همه', 'csb' ); ?>
+					</a>
+					<a class="csb-filter-chip <?php echo 'in_person' === $active_type ? 'csb-filter-chip--active' : ''; ?>"
+						href="<?php echo esc_url( add_query_arg( 'csb_type', 'in_person', $archive_base_url ) ); ?>"
+						<?php echo 'in_person' === $active_type ? 'aria-current="page"' : ''; ?>>
+						<?php esc_html_e( 'حضوری', 'csb' ); ?>
+					</a>
+					<a class="csb-filter-chip <?php echo 'online' === $active_type ? 'csb-filter-chip--active' : ''; ?>"
+						href="<?php echo esc_url( add_query_arg( 'csb_type', 'online', $archive_base_url ) ); ?>"
+						<?php echo 'online' === $active_type ? 'aria-current="page"' : ''; ?>>
+						<?php esc_html_e( 'آنلاین', 'csb' ); ?>
+					</a>
+				</div>
 
-	<?php else : ?>
-		<p class="csb-no-results"><?php esc_html_e( 'کلاسی یافت نشد.', 'csb' ); ?></p>
-	<?php endif; ?>
+			</nav>
+			<?php endif; ?>
 
-</main>
+			<?php if ( have_posts() ) : ?>
+
+			<div class="csb-cards csb-cards--<?php echo esc_attr( $card_style ); ?>"
+				data-cols="<?php echo esc_attr( (string) $archive_columns ); ?>"
+				data-layout="<?php echo esc_attr( $archive_layout ); ?>">
+
+				<?php while ( have_posts() ) : the_post();
+					$product = wc_get_product( get_the_ID() );
+					if ( ! $product ) {
+						continue;
+					}
+
+					$post_id    = $product->get_id();
+					$permalink  = get_permalink( $post_id );
+					$title      = get_the_title( $post_id );
+
+					// Image / placeholder.
+					$image_id  = (int) get_post_thumbnail_id( $post_id );
+					$has_image = $image_id > 0;
+
+					// Category.
+					$cat_name = CardData::category_name( $post_id );
+					$emoji    = CardData::emoji_for_category( $cat_name );
+
+					// Type badge.
+					$class_type       = get_post_meta( $post_id, '_csb_class_type', true );
+					$class_type       = is_string( $class_type ) ? $class_type : 'in_person';
+					$type_badge_slug  = 'online' === $class_type ? 'online' : 'in_person';
+					$type_badge_label = 'online' === $class_type
+						? esc_html__( 'آنلاین زنده', 'csb' )
+						: esc_html__( 'حضوری', 'csb' );
+
+					// Instructor.
+					$instructor = CardData::instructor_name( $post_id );
+
+					// Next session + seats.
+					$next_session   = CardData::next_session( $post_id );
+					$session_date   = '';
+					$seats_avail    = 0;
+					if ( $next_session ) {
+						$session_date = Jalali::toJalali( $next_session['start_at'], 'Y/m/d' );
+						$seats_avail  = CardData::available_seats( $next_session );
+					}
+
+					// Level.
+					$level = get_post_meta( $post_id, '_csb_level', true );
+					$level = is_string( $level ) ? $level : '';
+
+					// Rating.
+					$rating_count = (int) $product->get_rating_count();
+					$avg_rating   = (float) $product->get_average_rating();
+
+					// Excerpt.
+					$excerpt = $product->get_short_description() ?: '';
+
+					// Price / early-bird.
+					$regular_price  = (float) $product->get_regular_price();
+					$earlybird_price = (float) get_post_meta( $post_id, '_csb_earlybird_price', true );
+					$earlybird_end  = (string) get_post_meta( $post_id, '_csb_earlybird_end', true );
+					$earlybird_active = $earlybird_price > 0 && $earlybird_price < $regular_price
+						&& ( '' === $earlybird_end || strtotime( $earlybird_end ) > time() );
+				?>
+
+				<article id="product-<?php the_ID(); ?>" <?php post_class( 'csb-card csb-card--class' ); ?>
+					itemscope itemtype="https://schema.org/Course">
+
+					<?php if ( ! empty( $s['card_show_image'] ) ) : ?>
+					<a class="csb-card__media" href="<?php echo esc_url( $permalink ); ?>" tabindex="-1" aria-hidden="true">
+						<?php if ( $has_image ) : ?>
+							<?php echo wp_get_attachment_image( $image_id, 'medium', false, [
+								'loading' => 'lazy',
+								'alt'     => esc_attr( $title ),
+								'class'   => 'csb-card__img',
+							] ); ?>
+						<?php else : ?>
+							<span class="csb-card__placeholder" data-cat="<?php echo esc_attr( $cat_name ); ?>">
+								<?php echo esc_html( $emoji ); ?>
+							</span>
+						<?php endif; ?>
+						<?php if ( ! empty( $s['card_show_type_badge'] ) ) : ?>
+							<span class="csb-card__badge csb-card__badge--<?php echo esc_attr( $type_badge_slug ); ?>">
+								<?php echo $type_badge_label; // already escaped above ?>
+							</span>
+						<?php endif; ?>
+					</a>
+					<?php endif; ?>
+
+					<div class="csb-card__body">
+
+						<?php if ( ! empty( $s['card_show_category'] ) && '' !== $cat_name ) : ?>
+						<span class="csb-card__cat"><?php echo esc_html( $cat_name ); ?></span>
+						<?php endif; ?>
+
+						<h3 class="csb-card__title" itemprop="name">
+							<a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $title ); ?></a>
+						</h3>
+
+						<?php if ( ! empty( $s['card_show_instructor'] ) && '' !== $instructor ) : ?>
+						<div class="csb-card__instructor">
+							<?php echo esc_html( $instructor ); ?>
+						</div>
+						<?php endif; ?>
+
+						<ul class="csb-card__meta">
+							<?php if ( ! empty( $s['card_show_next_session'] ) && '' !== $session_date ) : ?>
+							<li class="csb-card__date">
+								<time><?php echo esc_html( $session_date ); ?></time>
+							</li>
+							<?php endif; ?>
+
+							<?php if ( ! empty( $s['card_show_seats'] ) && $next_session && $seats_avail >= 0 ) : ?>
+							<li class="csb-card__seats">
+								<?php echo esc_html( (string) $seats_avail ); ?> <?php esc_html_e( 'صندلی خالی', 'csb' ); ?>
+							</li>
+							<?php endif; ?>
+
+							<?php if ( ! empty( $s['card_show_level'] ) && '' !== $level ) : ?>
+							<li class="csb-card__level"><?php echo esc_html( $level ); ?></li>
+							<?php endif; ?>
+						</ul>
+
+						<?php if ( ! empty( $s['card_show_rating'] ) && $rating_count > 0 ) : ?>
+						<div class="csb-card__rating"
+							itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"
+							aria-label="<?php echo esc_attr( sprintf( __( '%1$.1f از ۵ — %2$d نظر', 'csb' ), $avg_rating, $rating_count ) ); ?>">
+							<?php echo wc_get_rating_html( $avg_rating, $rating_count ); ?>
+							<span class="csb-card__rating-count">(<?php echo esc_html( (string) $rating_count ); ?>)</span>
+							<meta itemprop="ratingValue" content="<?php echo esc_attr( number_format( $avg_rating, 1, '.', '' ) ); ?>">
+							<meta itemprop="reviewCount" content="<?php echo esc_attr( (string) $rating_count ); ?>">
+						</div>
+						<?php endif; ?>
+
+						<?php if ( ! empty( $s['card_show_excerpt'] ) && '' !== $excerpt ) : ?>
+						<p class="csb-card__excerpt"><?php echo wp_kses_post( wp_trim_words( $excerpt, 18, '...' ) ); ?></p>
+						<?php endif; ?>
+
+					</div><!-- .csb-card__body -->
+
+					<div class="csb-card__footer">
+
+						<?php if ( ! empty( $s['card_show_price'] ) ) : ?>
+						<div class="csb-card__price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+							<?php if ( $earlybird_active && ! empty( $s['card_show_earlybird'] ) ) : ?>
+								<del class="csb-card__price-regular">
+									<?php echo wp_kses_post( wc_price( $regular_price ) ); ?>
+								</del>
+								<ins class="csb-card__price-earlybird">
+									<?php echo wp_kses_post( wc_price( $earlybird_price ) ); ?>
+								</ins>
+							<?php else : ?>
+								<?php echo wp_kses_post( $product->get_price_html() ); ?>
+							<?php endif; ?>
+						</div>
+						<?php endif; ?>
+
+						<a class="csb-btn csb-btn--primary csb-card__cta"
+							href="<?php echo esc_url( $permalink ); ?>">
+							<?php echo $card_cta_label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped — escaped above ?>
+						</a>
+
+					</div><!-- .csb-card__footer -->
+
+				</article><!-- .csb-card -->
+
+				<?php endwhile; ?>
+
+			</div><!-- .csb-cards -->
+
+			<?php the_posts_pagination( [
+				'prev_text' => esc_html__( '&laquo; قبلی', 'csb' ),
+				'next_text' => esc_html__( 'بعدی &raquo;', 'csb' ),
+			] ); ?>
+
+			<?php else : ?>
+			<p class="csb-no-results"><?php esc_html_e( 'کلاسی یافت نشد.', 'csb' ); ?></p>
+			<?php endif; ?>
+
+		</div><!-- .csb-archive__main -->
+
+	</div><!-- .csb-archive__layout -->
+
+</section><!-- .csb-archive -->
 
 <?php get_footer( 'shop' ); ?>

@@ -326,7 +326,7 @@ class ProductTypes {
 				</p>
 
 				<p class="form-field">
-					<label for="_csb_deposit_value"><?php esc_html_e( 'مقدار بیعانه (% یا تومان)', 'csb' ); ?></label>
+					<label for="_csb_deposit_value"><?php esc_html_e( 'مقدار بیعانه (% یا مبلغ ثابت)', 'csb' ); ?></label>
 					<input type="number" id="_csb_deposit_value" name="_csb_deposit_value"
 						value="<?php echo esc_attr( (string) $meta['deposit_value'] ); ?>" step="0.01" min="0" />
 				</p>
@@ -372,7 +372,7 @@ class ProductTypes {
 				</p>
 
 				<p class="form-field">
-					<label for="_csb_earlybird_price"><?php esc_html_e( 'قیمت ثبت‌نام زودهنگام (تومان)', 'csb' ); ?></label>
+					<label for="_csb_earlybird_price"><?php esc_html_e( 'قیمت ثبت‌نام زودهنگام', 'csb' ); ?></label>
 					<input type="number" id="_csb_earlybird_price" name="_csb_earlybird_price"
 						value="<?php echo esc_attr( (string) $meta['earlybird_price'] ); ?>"
 						step="100" min="0" />

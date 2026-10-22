@@ -316,9 +316,10 @@ class RefundService {
 			'subject'       => __( 'بازگشت وجه رزرو شما تأیید شد.', 'csb' ),
 			'body'          => sprintf(
 				/* translators: 1: booking_id  2: refund_amount */
-				__( "رزرو #%1\$d لغو و مبلغ %2\$s تومان به %3\$s شما بازگشت داده شد.", 'csb' ),
+				/* translators: 1: booking_id  2: refund_amount with currency  3: method */
+				__( "رزرو #%1\$d لغو و مبلغ %2\$s به %3\$s شما بازگشت داده شد.", 'csb' ),
 				$booking_id,
-				number_format_i18n( $refund_amount ),
+				strip_tags( wc_price( $refund_amount ) ),
 				'wallet' === $method ? __( 'کیف‌پول', 'csb' ) : __( 'حساب بانکی', 'csb' )
 			),
 		] );

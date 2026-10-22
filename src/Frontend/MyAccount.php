@@ -372,7 +372,7 @@ class MyAccount {
 		echo '<h2>' . esc_html__( 'کیف‌پول', 'csb' ) . '</h2>';
 		echo '<div class="csb-wallet__balance">';
 		echo '<span>' . esc_html__( 'موجودی:', 'csb' ) . '</span> ';
-		echo '<strong>' . esc_html( number_format_i18n( $balance ) ) . ' ' . esc_html__( 'تومان', 'csb' ) . '</strong>';
+		echo '<strong>' . wp_kses_post( wc_price( $balance ) ) . '</strong>';
 		echo '</div>';
 
 		if ( $txns ) {

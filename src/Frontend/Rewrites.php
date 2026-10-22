@@ -20,6 +20,7 @@
 
 namespace CookingSchoolBooking\Frontend;
 
+use CookingSchoolBooking\Admin\AppearancePage;
 use CookingSchoolBooking\Products\ProductTypes;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,6 +37,7 @@ class Rewrites {
 	 */
 	public function init(): void {
 		add_action( 'init', [ $this, 'add_rewrite_rules' ], 10 );
+		add_action( 'widgets_init', [ $this, 'register_sidebar' ] );
 		add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
 		add_action( 'pre_get_posts', [ $this, 'filter_archive_query' ] );
 		add_filter( 'template_include', [ $this, 'maybe_load_template' ], 20 );
@@ -45,6 +47,21 @@ class Rewrites {
 
 		// 301 redirect /product/{slug} → /{base}/{slug} for our types.
 		add_action( 'template_redirect', [ $this, 'maybe_redirect_default_product_url' ], 2 );
+	}
+
+	/**
+	 * Registers the archive sidebar widget area.
+	 */
+	public function register_sidebar(): void {
+		register_sidebar( [
+			'id'            => 'csb-archive-sidebar',
+			'name'          => esc_html__( 'سایدبار آرشیو آموزشگاه', 'csb' ),
+			'description'   => esc_html__( 'ویجت‌های نمایش‌داده‌شده در سایدبار صفحه آرشیو دوره‌ها.', 'csb' ),
+			'before_widget' => '<div id="%1$s" class="widget csb-sidebar-widget %2$s">',
+			'after_widget'  => '</div>',
+			'before_title'  => '<h3 class="widget-title csb-sidebar-widget__title">',
+			'after_title'   => '</h3>',
+		] );
 	}
 
 	// ── Rewrite rules ─────────────────────────────────────────────────────────
@@ -105,6 +122,8 @@ class Rewrites {
 	public function add_query_vars( array $vars ): array {
 		$vars[] = 'csb_product_type';
 		$vars[] = 'csb_archive';
+		$vars[] = 'csb_cat';   // product_cat slug filter on archive pages.
+		$vars[] = 'csb_type';  // in_person | online filter on archive pages.
 		return $vars;
 	}
 
@@ -112,7 +131,7 @@ class Rewrites {
 
 	/**
 	 * On our custom archive pages, filter `product` post queries to only
-	 * return products of the matching type.
+	 * return products of the matching type, and apply per_page + cat/type filters.
 	 */
 	public function filter_archive_query( \WP_Query $query ): void {
 		if ( is_admin() || ! $query->is_main_query() ) {
@@ -126,22 +145,51 @@ class Rewrites {
 			return;
 		}
 
-		// Restrict to products of this type.
+		// Archive: list all products of this type.
 		if ( '1' === $archive ) {
-			// Archive: no single name — list all products of this type.
 			$query->set( 'post_type', 'product' );
-			$query->set( 'posts_per_page', (int) get_option( 'posts_per_page', 12 ) );
+
+			// Use archive_per_page from appearance settings.
+			$style    = AppearancePage::get();
+			$per_page = max( 1, (int) ( $style['archive_per_page'] ?? 12 ) );
+			$query->set( 'posts_per_page', $per_page );
+
 			$query->set( 'csb_product_type', $type ); // kept for template detection
 		}
 
-		// Filter by product type via tax_query on product type taxonomy.
-		$existing_tax = (array) ( $query->get( 'tax_query' ) ?: [] );
-		$existing_tax[] = [
+		// Build combined tax_query.
+		$tax_query = (array) ( $query->get( 'tax_query' ) ?: [] );
+
+		// Filter by product type taxonomy.
+		$tax_query[] = [
 			'taxonomy' => 'product_type',
 			'field'    => 'slug',
 			'terms'    => [ $type ],
 		];
-		$query->set( 'tax_query', $existing_tax );
+
+		// Optional: filter by product category (?csb_cat=slug).
+		$csb_cat = sanitize_title( (string) ( $_GET['csb_cat'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( '' !== $csb_cat ) {
+			$tax_query[] = [
+				'taxonomy' => 'product_cat',
+				'field'    => 'slug',
+				'terms'    => [ $csb_cat ],
+			];
+		}
+
+		$query->set( 'tax_query', $tax_query );
+
+		// Optional: filter by class type (_csb_class_type meta) (?csb_type=in_person|online).
+		$csb_type = sanitize_key( (string) ( $_GET['csb_type'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( in_array( $csb_type, [ 'in_person', 'online' ], true ) ) {
+			$meta_query   = (array) ( $query->get( 'meta_query' ) ?: [] );
+			$meta_query[] = [
+				'key'     => '_csb_class_type',
+				'value'   => $csb_type,
+				'compare' => '=',
+			];
+			$query->set( 'meta_query', $meta_query );
+		}
 	}
 
 	// ── Template loader ───────────────────────────────────────────────────────

@@ -50,9 +50,21 @@ $sessions = \CookingSchoolBooking\Services\CapacityService::get_upcoming_session
 
 		<!-- ── Hero ── -->
 		<header class="csb-hero">
-			<?php if ( $image ) : ?>
-				<div class="csb-hero__thumb"><?php echo $image; ?></div>
-			<?php endif; ?>
+			<?php
+			// Hero image: featured thumbnail or emoji placeholder.
+			use CookingSchoolBooking\Frontend\CardData;
+			$_hero_cat   = CardData::category_name( $post_id );
+			$_hero_emoji = CardData::emoji_for_category( $_hero_cat );
+			?>
+			<div class="csb-hero__thumb">
+				<?php if ( $image ) : ?>
+					<?php echo $image; // wp_get_attachment_image — already safe ?>
+				<?php else : ?>
+					<span class="csb-card__placeholder csb-hero__placeholder" data-cat="<?php echo esc_attr( $_hero_cat ); ?>">
+						<?php echo esc_html( $_hero_emoji ); ?>
+					</span>
+				<?php endif; ?>
+			</div>
 			<div class="csb-hero__body">
 				<h1 class="csb-hero__title" itemprop="name"><?php echo esc_html( $title ); ?></h1>
 				<ul class="csb-meta-list" role="list">
@@ -134,7 +146,6 @@ $sessions = \CookingSchoolBooking\Services\CapacityService::get_upcoming_session
 
 								$balance_amount = round( $full_price - $deposit_amount, 2 );
 
-								$wc_currency = get_woocommerce_currency_symbol();
 								?>
 								<form class="csb-reserve-form" method="post"
 									action="<?php echo esc_url( wc_get_cart_url() ); ?>">
@@ -155,14 +166,7 @@ $sessions = \CookingSchoolBooking\Services\CapacityService::get_upcoming_session
 											<?php esc_html_e( 'پرداخت کامل', 'csb' ); ?>
 											<span id="csb-full-desc-<?php echo esc_attr( (string) $session_id ); ?>"
 												style="font-size:.85em;color:#555;display:inline-block;margin-right:.35em;">
-												<?php
-												printf(
-													/* translators: %1$s: amount  %2$s: currency */
-													esc_html__( '(%1$s %2$s)', 'csb' ),
-													esc_html( number_format_i18n( $full_price ) ),
-													esc_html( $wc_currency )
-												);
-												?>
+												(<?php echo wp_kses_post( wc_price( $full_price ) ); ?>)
 											</span>
 										</label>
 
@@ -173,15 +177,10 @@ $sessions = \CookingSchoolBooking\Services\CapacityService::get_upcoming_session
 											<?php esc_html_e( 'پرداخت بیعانه', 'csb' ); ?>
 											<span id="csb-dep-desc-<?php echo esc_attr( (string) $session_id ); ?>"
 												style="font-size:.85em;color:#555;display:inline-block;margin-right:.35em;">
-												<?php
-												printf(
-													/* translators: 1: deposit  2: balance  3: currency */
-													esc_html__( '(%1$s همین الان، %2$s %3$s مانده)', 'csb' ),
-													esc_html( number_format_i18n( $deposit_amount ) ),
-													esc_html( number_format_i18n( $balance_amount ) ),
-													esc_html( $wc_currency )
-												);
-												?>
+												(<?php echo wp_kses_post( wc_price( $deposit_amount ) ); ?>
+												<?php esc_html_e( 'همین الان،', 'csb' ); ?>
+												<?php echo wp_kses_post( wc_price( $balance_amount ) ); ?>
+												<?php esc_html_e( 'مانده)', 'csb' ); ?>)
 											</span>
 										</label>
 										<?php endif; ?>

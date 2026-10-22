@@ -219,9 +219,9 @@ class CheckoutHooks {
 				<span>
 					<?php
 					printf(
-						/* translators: %s: wallet balance formatted */
-						esc_html__( 'از اعتبار کیف‌پولم (موجودی: %s تومان) استفاده کن.', 'csb' ),
-						esc_html( number_format_i18n( $balance ) )
+						/* translators: %s: wallet balance formatted with WC currency */
+						esc_html__( 'از اعتبار کیف‌پولم (موجودی: %s) استفاده کن.', 'csb' ),
+						wp_kses_post( wc_price( $balance ) )
 					);
 					?>
 				</span>

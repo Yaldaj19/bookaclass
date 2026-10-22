@@ -131,12 +131,13 @@ class ReminderCron {
 			'body'       => sprintf(
 				/* translators: 1: class title  2: booking ID  3: balance  4: days  5: pay URL */
 				__(
-					"هنرجوی عزیز،\n\nمانده‌ی رزرو دوره «%1\$s» (#%2\$d) به مبلغ %3\$s تومان باید ظرف %4\$d روز آینده تسویه شود.\n\nلینک پرداخت: %5\$s\n\nآموزشگاه",
+					/* translators: 1: class title  2: booking ID  3: balance with currency  4: days  5: pay URL */
+					"هنرجوی عزیز،\n\nمانده‌ی رزرو دوره «%1\$s» (#%2\$d) به مبلغ %3\$s باید ظرف %4\$d روز آینده تسویه شود.\n\nلینک پرداخت: %5\$s\n\nآموزشگاه",
 					'csb'
 				),
 				$class_title,
 				$booking_id,
-				number_format_i18n( $balance_due ),
+				strip_tags( wc_price( $balance_due ) ),
 				$days_remaining,
 				$pay_url
 			),

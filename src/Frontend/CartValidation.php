@@ -192,9 +192,9 @@ class CartValidation {
 			$item_data[] = [
 				'key'   => esc_html__( 'روش پرداخت', 'csb' ),
 				'value' => sprintf(
-					/* translators: %s: balance amount */
-					esc_html__( 'بیعانه (مانده: %s تومان)', 'csb' ),
-					esc_html( number_format_i18n( $balance_due ) )
+					/* translators: %s: balance amount formatted with WC currency */
+					esc_html__( 'بیعانه (مانده: %s)', 'csb' ),
+					wp_kses_post( wc_price( $balance_due ) )
 				),
 			];
 		}

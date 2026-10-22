@@ -206,7 +206,7 @@ class CouponsPage {
 								<td>
 									<?php echo 'percent' === $c['discount_type']
 										? esc_html( $c['amount'] . '%' )
-										: esc_html( number_format( (float) $c['amount'] ) . ' تومان' ); ?>
+										: wp_kses_post( wc_price( (float) $c['amount'] ) ); ?>
 								</td>
 								<td>
 									<?php echo esc_html( $c['usage_count'] )
