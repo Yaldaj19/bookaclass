@@ -239,7 +239,9 @@ final class Plugin {
 	 * Registers the top-level «آموزشگاه» admin menu and sub-pages.
 	 */
 	private function register_admin_menu(): void {
-		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
+		// Priority 1 so the «آموزشگاه» parent menu exists before any sub-page
+		// (SettingsHub, Bookings, etc.) attaches its submenu on admin_menu @10.
+		add_action( 'admin_menu', [ $this, 'add_admin_menu' ], 1 );
 	}
 
 	/**
