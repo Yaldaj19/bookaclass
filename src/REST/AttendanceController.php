@@ -95,12 +95,71 @@ class AttendanceController {
 
 	// ── Permission callbacks ───────────────────────────────────────────────────
 
-	public function instructor_permission(): bool {
-		return current_user_can( 'manage_woocommerce' ) || current_user_can( 'csb_view_sessions' );
+	/**
+	 * Instructor/admin check-in permission.
+	 *
+	 * WC admins may act on any booking. Instructors (csb_view_sessions) may only
+	 * act on bookings belonging to a session of a class they are assigned to
+	 * (via the `_csb_instructor_id` postmeta on the class product). This prevents
+	 * an IDOR where one instructor marks attendance on another instructor's class.
+	 *
+	 * @param  \WP_REST_Request $request
+	 * @return bool|\WP_Error
+	 */
+	public function instructor_permission( \WP_REST_Request $request ) {
+		if ( current_user_can( 'manage_woocommerce' ) ) {
+			return true;
+		}
+
+		if ( ! current_user_can( 'csb_view_sessions' ) ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				esc_html__( 'دسترسی غیرمجاز.', 'csb' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		$booking_id = (int) $request->get_param( 'booking_id' );
+		if ( ! $this->instructor_owns_booking( $booking_id, get_current_user_id() ) ) {
+			return new \WP_Error(
+				'csb_not_owner',
+				esc_html__( 'این رزرو به جلسات شما تعلق ندارد.', 'csb' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		return true;
 	}
 
 	public function admin_permission(): bool {
 		return current_user_can( 'manage_woocommerce' );
+	}
+
+	/**
+	 * True when the given instructor is assigned to the class product that owns
+	 * the booking's session (via `_csb_instructor_id` postmeta).
+	 */
+	private function instructor_owns_booking( int $booking_id, int $instructor_id ): bool {
+		global $wpdb;
+
+		if ( $booking_id <= 0 || $instructor_id <= 0 ) {
+			return false;
+		}
+
+		$match = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*)
+			   FROM {$wpdb->prefix}csb_bookings b
+			   JOIN {$wpdb->prefix}csb_sessions s ON s.id = b.session_id
+			   JOIN {$wpdb->postmeta} pm
+			          ON pm.post_id  = s.class_id
+			         AND pm.meta_key = '_csb_instructor_id'
+			         AND CAST( pm.meta_value AS UNSIGNED ) = %d
+			  WHERE b.id = %d",
+			$instructor_id,
+			$booking_id
+		) );
+
+		return $match > 0;
 	}
 
 	// ── Endpoints ─────────────────────────────────────────────────────────────

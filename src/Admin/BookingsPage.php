@@ -118,9 +118,9 @@ class BookingsPage {
 		foreach ( $rows as $r ) {
 			fputcsv( $out, [
 				$r['id'],
-				$r['student_name'],
-				$r['student_email'],
-				$r['class_title'],
+				self::csv_safe( $r['student_name'] ),
+				self::csv_safe( $r['student_email'] ),
+				self::csv_safe( $r['class_title'] ),
 				\BookaClass\Support\Jalali::to_jalali_string( $r['start_at'] ),
 				$r['status'],
 				$r['deposit_amount'],
@@ -132,6 +132,21 @@ class BookingsPage {
 
 		fclose( $out );
 		exit;
+	}
+
+	/**
+	 * Neutralises CSV formula injection: prefixes a single quote to any value
+	 * beginning with = + - @ or a tab/CR so spreadsheet apps treat it as text.
+	 *
+	 * @param  mixed $value
+	 * @return string
+	 */
+	private static function csv_safe( $value ): string {
+		$value = (string) $value;
+		if ( '' !== $value && in_array( $value[0], [ '=', '+', '-', '@', "\t", "\r" ], true ) ) {
+			return "'" . $value;
+		}
+		return $value;
 	}
 
 	// ── Bulk SMS ──────────────────────────────────────────────────────────────

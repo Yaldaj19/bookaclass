@@ -1,6 +1,6 @@
 <?php
 /**
- * Uninstall routine for Cooking School Booking.
+ * Uninstall routine for BookaClass.
  *
  * Fires when the user deletes the plugin from the WordPress admin.
  * Data is dropped ONLY when the operator has explicitly opted in via
@@ -40,13 +40,20 @@ if ( $delete ) {
 
 	// Drop in reverse dependency order.
 	$tables = [
-		$wpdb->prefix . 'csb_audit_log',
-		$wpdb->prefix . 'csb_wallet_txns',
-		$wpdb->prefix . 'csb_enrollments',
-		$wpdb->prefix . 'csb_bookings',
-		$wpdb->prefix . 'csb_seat_locks',
-		$wpdb->prefix . 'csb_sessions',
-	];
+			$wpdb->prefix . 'csb_audit_log',
+			$wpdb->prefix . 'csb_reschedule_requests',
+			$wpdb->prefix . 'csb_attendance',
+			$wpdb->prefix . 'csb_certificates',
+			$wpdb->prefix . 'csb_otp_tokens',
+			$wpdb->prefix . 'csb_coupons',
+			$wpdb->prefix . 'csb_video_tokens',
+			$wpdb->prefix . 'csb_refund_requests',
+			$wpdb->prefix . 'csb_wallet_txns',
+			$wpdb->prefix . 'csb_enrollments',
+			$wpdb->prefix . 'csb_bookings',
+			$wpdb->prefix . 'csb_seat_locks',
+			$wpdb->prefix . 'csb_sessions',
+		];
 
 	foreach ( $tables as $table ) {
 		// Table names are hardcoded above — no user input, no prepare needed.
@@ -56,4 +63,6 @@ if ( $delete ) {
 	delete_option( 'csb_settings' );
 	delete_option( 'csb_cpt_config' );
 	delete_option( 'csb_seo_config' );
+		delete_option( 'csb_style' );
+		delete_option( 'csb_slug_redirects' );
 }

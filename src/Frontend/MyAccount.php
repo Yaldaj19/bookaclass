@@ -554,8 +554,8 @@ body{font-family:Tahoma,Arial,sans-serif;background:#f5f0e8;display:flex;justify
 			exit;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( ! wp_verify_nonce( $_GET['csb_ics_nonce'] ?? '', 'csb_ics_' . $booking_id ) ) {
+		$ics_nonce = isset( $_GET['csb_ics_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['csb_ics_nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $ics_nonce, 'csb_ics_' . $booking_id ) ) {
 			wp_die( esc_html__( 'درخواست نامعتبر است.', 'csb' ) );
 		}
 

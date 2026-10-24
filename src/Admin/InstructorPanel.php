@@ -129,15 +129,30 @@ class InstructorPanel {
 
 		foreach ( $roster as $r ) {
 			fputcsv( $out, [
-				$r['student_name'] ?? '',
-				$r['student_email'] ?? '',
-				$r['booking_status'] ?? '',
-				$r['status'] ?? 'ثبت نشده',
+				self::csv_safe( $r['student_name'] ?? '' ),
+				self::csv_safe( $r['student_email'] ?? '' ),
+				self::csv_safe( $r['booking_status'] ?? '' ),
+				self::csv_safe( $r['status'] ?? 'ثبت نشده' ),
 			] );
 		}
 
 		fclose( $out );
 		exit;
+	}
+
+	/**
+	 * Neutralises CSV formula injection: prefixes a single quote to any value
+	 * beginning with = + - @ or a tab/CR so spreadsheet apps treat it as text.
+	 *
+	 * @param  mixed $value
+	 * @return string
+	 */
+	private static function csv_safe( $value ): string {
+		$value = (string) $value;
+		if ( '' !== $value && in_array( $value[0], [ '=', '+', '-', '@', "\t", "\r" ], true ) ) {
+			return "'" . $value;
+		}
+		return $value;
 	}
 
 	// ── Render: sessions list ─────────────────────────────────────────────────

@@ -618,8 +618,13 @@ class Schema {
 			'@graph'   => $clean,
 		];
 
+		// Note: JSON_UNESCAPED_SLASHES is intentionally omitted so forward slashes
+		// are escaped as \/ — this prevents a "</script>" sequence inside any
+		// string value (post title, instructor name, review body…) from breaking
+		// out of the <script> element (stored XSS). Escaped slashes remain valid
+		// JSON-LD and are parsed correctly by search engines.
 		echo '<script type="application/ld+json">'
-			. wp_json_encode( $graph, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT )
+			. wp_json_encode( $graph, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT )
 			. '</script>' . "\n";
 	}
 
