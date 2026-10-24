@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce My Account tabs for Cooking School Booking.
+ * WooCommerce My Account tabs for BookaClass.
  *
  * Tabs:
  *   csb-bookings — booking history + «تسویه مانده» for deposit_paid + cancel via RefundService

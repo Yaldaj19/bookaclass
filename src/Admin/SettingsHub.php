@@ -1,7 +1,7 @@
 <?php
 /**
  * Settings Hub — comprehensive, WooCommerce-grade tabbed settings for the
- * Cooking School Booking plugin.
+ * BookaClass plugin.
  *
  * Replaces the old flat SettingsPage render while keeping SettingsPage::get()
  * as the authoritative backward-compatible getter — so every other class

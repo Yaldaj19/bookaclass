@@ -278,7 +278,7 @@ class ContentTypesPage {
 					</tr>
 					<tr>
 						<th><label><?php esc_html_e( 'Slug', 'csb' ); ?></label></th>
-						<td><input type="text" class="regular-text" dir="ltr" name="csb_new_tax[slug]" placeholder="cooking-style" /></td>
+						<td><input type="text" class="regular-text" dir="ltr" name="csb_new_tax[slug]" placeholder="class-level" /></td>
 					</tr>
 					<tr>
 						<th><?php esc_html_e( 'سلسله‌مراتبی', 'csb' ); ?></th>

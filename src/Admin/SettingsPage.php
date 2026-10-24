@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings page for Cooking School Booking.
+ * Settings page for BookaClass.
  *
  * Registers the csb_settings option group and renders the admin form.
  * All defaults are defined here; individual classes can override specific values.

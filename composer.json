@@ -1,6 +1,6 @@
 {
-    "name": "cooking-school/booking",
-    "description": "WooCommerce extension for cooking school class booking and video courses",
+    "name": "BookaClass/booking",
+    "description": "WooCommerce extension for class booking and video courses",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "require": {

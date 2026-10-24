@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce checkout customisations for the cooking-school context.
+ * WooCommerce checkout customisations for the BookaClass.
  *
  * Phase 4 additions on top of Phase 3:
  *  1. Deposit/full radio buttons on the single-class product page.

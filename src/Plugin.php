@@ -105,7 +105,7 @@ final class Plugin {
 	public function notice_woocommerce_missing(): void {
 		$message = sprintf(
 			/* translators: %s: WooCommerce plugin name. */
-			esc_html__( 'افزونه‌ی «Cooking School Booking» برای کار نیاز به %s دارد. لطفاً ابتدا WooCommerce را نصب و فعال کنید.', 'csb' ),
+			esc_html__( 'افزونه‌ی «BookaClass» برای کار نیاز به %s دارد. لطفاً ابتدا WooCommerce را نصب و فعال کنید.', 'csb' ),
 			'<strong>WooCommerce</strong>'
 		);
 

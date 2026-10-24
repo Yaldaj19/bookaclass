@@ -60,7 +60,7 @@ class AppearancePage {
 	// ── Defaults ─────────────────────────────────────────────────────────────
 
 	/**
-	 * Default token values — warm cooking-school terracotta/orange palette.
+	 * Default token values — warm warm terracotta/orange palette.
 	 *
 	 * @return array<string,mixed>
 	 */

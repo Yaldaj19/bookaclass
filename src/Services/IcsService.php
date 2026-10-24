@@ -78,7 +78,7 @@ class IcsService {
 		$lines   = [];
 		$lines[] = 'BEGIN:VCALENDAR';
 		$lines[] = 'VERSION:2.0';
-		$lines[] = 'PRODID:-//Cooking School Booking//CSB//FA';
+		$lines[] = 'PRODID:-//BookaClass//CSB//FA';
 		$lines[] = 'CALSCALE:GREGORIAN';
 		$lines[] = 'METHOD:PUBLISH';
 

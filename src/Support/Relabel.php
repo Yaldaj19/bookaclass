@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce string relabelling for the cooking-school context.
+ * WooCommerce string relabelling for the BookaClass.
  *
  * Hooks into WordPress gettext filters to replace a small set of WooCommerce
  * UI strings so the storefront feels like a class-booking platform, not a
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Relabel {
 
 	/**
-	 * Core mapping: WooCommerce string → cooking-school string.
+	 * Core mapping: WooCommerce string → BookaClass string.
 	 * Keys are exact WC source strings (Persian translations).
 	 * Keep the list small and purposeful.
 	 *
@@ -128,7 +128,7 @@ class Relabel {
 	 * settings, WP menus screen).
 	 *
 	 * We check conservatively: only suppress on pages that are definitely NOT
-	 * the cooking-school product/archive/single pages.
+	 * the BookaClass product/archive/single pages.
 	 */
 	private function is_protected_admin_screen(): bool {
 		if ( ! is_admin() ) {
