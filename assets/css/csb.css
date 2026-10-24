@@ -1784,9 +1784,15 @@
 
 /* ── Sidebar layout ────────────────────────────────────────────────────── */
 .csb-archive__layout { display: grid; gap: 32px; align-items: start; }
-.csb-archive__layout[data-sidebar="right"] { grid-template-columns: 1fr 268px; }
-.csb-archive__layout[data-sidebar="left"]  { grid-template-columns: 268px 1fr; }
-.csb-archive__layout[data-sidebar="left"] .csb-archive__sidebar { order: -1; }
+.csb-archive__layout[data-sidebar="none"] { grid-template-columns: 1fr; }
+/* Explicit column placement — the <aside> is first in the DOM, so without this */
+/* it would grab the 1fr track and squash the card grid (RTL auto-flow bug).    */
+.csb-archive__layout[data-sidebar="right"] { grid-template-columns: 268px 1fr; }
+.csb-archive__layout[data-sidebar="right"] .csb-archive__sidebar { grid-column: 1; }
+.csb-archive__layout[data-sidebar="right"] .csb-archive__main    { grid-column: 2; }
+.csb-archive__layout[data-sidebar="left"]  { grid-template-columns: 1fr 268px; }
+.csb-archive__layout[data-sidebar="left"]  .csb-archive__sidebar { grid-column: 2; }
+.csb-archive__layout[data-sidebar="left"]  .csb-archive__main    { grid-column: 1; }
 .csb-archive__sidebar {
   font-family: var(--csb-font);
   background: var(--csb-surface);
@@ -1845,7 +1851,23 @@
 .csb-cards[data-cols="4"] { --cols: 4; }
 .csb-cards[data-layout="list"] { grid-template-columns: 1fr; gap: 16px; }
 
-/* ── Base card ─────────────────────────────────────────────────────────── */
+/* ── Shared card design tokens (derived from the --csb-* base palette) ───── */
+/* Used by the richer card styles (editorial, ticket). All values trace back  */
+/* to the admin-editable base tokens, so the colour pickers keep control.     */
+.csb-cards {
+  --csb-card-surface: color-mix(in srgb, var(--csb-accent) 5%, var(--csb-surface));
+  --csb-accent-gradient: linear-gradient(90deg,
+      var(--csb-accent) 0%,
+      var(--csb-primary) 100%);
+  --csb-shadow-card:
+      0 2px 6px -2px color-mix(in srgb, var(--csb-text) 7%, transparent),
+      0 18px 44px -18px color-mix(in srgb, var(--csb-primary) 20%, transparent);
+  --csb-shadow-card-hover:
+      0 10px 24px -8px color-mix(in srgb, var(--csb-text) 12%, transparent),
+      0 28px 60px -18px color-mix(in srgb, var(--csb-primary) 34%, transparent);
+}
+
+/* ── Base card (also = Style 1 "Classic") ──────────────────────────────── */
 .csb-card {
   position: relative; display: flex; flex-direction: column;
   background: var(--csb-surface); border: 1px solid var(--csb-border);
@@ -1940,6 +1962,9 @@
   font-size: .8rem; color: var(--csb-muted);
 }
 .csb-card__meta li { display: flex; align-items: center; gap: 4px; }
+/* Scarcity: last few seats shown in the danger colour (universal feature) */
+.csb-card__seats--low { color: var(--csb-danger); font-weight: 700; }
+@keyframes csb-seat-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
 .csb-card__rating { font-size: .83rem; }
 .csb-card__rating .star-rating { color: var(--csb-accent); }
 .csb-card__excerpt {
@@ -1961,6 +1986,13 @@
 .csb-card__price del  { font-size: .76rem; font-weight: 400; color: var(--csb-muted); }
 .csb-card__price ins  { text-decoration: none; color: var(--csb-primary); }
 .csb-card__price bdi  { color: var(--csb-primary); }
+/* Early-bird discount chip (universal feature, used by every card style) */
+.csb-card__discount {
+  align-self: flex-start; display: inline-block;
+  margin-top: 3px; padding: 1px 9px; border-radius: 999px;
+  background: var(--csb-danger); color: #fff;
+  font-size: .66rem; font-weight: 800; letter-spacing: .02em;
+}
 
 /* Base .csb-btn in the card context */
 .csb-btn {
@@ -2241,28 +2273,97 @@
   gap: 16px;
 }
 
-/* ── Archive pagination ─────────────────────────────────────────────────── */
-.csb-archive nav.woocommerce-pagination ul {
-  display: flex; gap: 8px; list-style: none;
-  padding: 0; margin: 36px 0 0; justify-content: center;
+/* ── 5. EDITORIAL "زعفرانی مجله‌ای" — parchment + saffron bookmark stripe ── */
+.csb-cards--editorial .csb-card {
+  background: var(--csb-card-surface);
+  box-shadow: var(--csb-shadow-card);
+  transition: transform .28s cubic-bezier(.2,.7,.3,1), box-shadow .28s, border-color .28s;
 }
-.csb-archive nav.woocommerce-pagination a,
-.csb-archive nav.woocommerce-pagination span {
-  display: grid; place-items: center;
-  min-width: 40px; height: 40px; padding: 0 10px;
-  border-radius: var(--csb-radius-sm);
-  border: 1px solid var(--csb-border);
-  background: var(--csb-surface); color: var(--csb-text);
-  text-decoration: none; font-size: .875rem; font-weight: 500;
-  transition: background .15s, color .15s, border-color .15s;
+.csb-cards--editorial .csb-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--csb-shadow-card-hover);
 }
-.csb-archive nav.woocommerce-pagination a:hover {
-  border-color: var(--csb-primary); color: var(--csb-primary);
-  background: color-mix(in srgb, var(--csb-primary) 6%, var(--csb-surface));
+/* Signature: saffron→rose gradient "bookmark" stripe across the card top */
+.csb-cards--editorial .csb-card::before {
+  content: "";
+  position: absolute; inset-block-start: 0; inset-inline: 0;
+  height: 4px; z-index: 4;
+  background: var(--csb-accent-gradient);
+  transition: height .25s ease;
 }
-.csb-archive nav.woocommerce-pagination .current {
-  background: var(--csb-primary); color: #fff; border-color: var(--csb-primary);
+.csb-cards--editorial .csb-card:hover::before { height: 6px; }
+
+/* Category as a soft accent pill */
+.csb-cards--editorial .csb-card__cat {
+  align-self: flex-start; display: inline-block;
+  padding: 3px 11px; border-radius: 999px; text-transform: none;
+  background: color-mix(in srgb, var(--csb-accent) 13%, transparent);
+  color: color-mix(in srgb, var(--csb-accent) 78%, #000);
+  font-size: .7rem; font-weight: 800; letter-spacing: .02em;
 }
+.csb-cards--editorial .csb-card__title { font-size: 1.18rem; }
+
+/* Meta bullets + pulsing scarcity dot */
+.csb-cards--editorial .csb-card__meta li { gap: 5px; }
+.csb-cards--editorial .csb-card__meta li::before {
+  content: ""; flex: none;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: color-mix(in srgb, var(--csb-accent) 55%, transparent);
+}
+.csb-cards--editorial .csb-card__seats--low::before {
+  background: var(--csb-danger);
+  animation: csb-seat-pulse 1.4s ease-in-out infinite;
+}
+
+/* Price emphasis + pill CTA */
+.csb-cards--editorial .csb-card__price {
+  font-size: 1.26rem;
+  font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;
+}
+.csb-cards--editorial .csb-card__footer { padding-block: 14px 18px; }
+.csb-cards--editorial .csb-btn--primary {
+  border-radius: 999px; padding: 9px 22px; font-size: .84rem;
+}
+
+/* ── 6. TICKET "بلیت" — admission-ticket card with a perforated price stub ─ */
+.csb-cards--ticket .csb-card__footer {
+  position: relative; margin-top: auto;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--csb-primary) 4%, var(--csb-surface));
+  border-top: 2px dashed color-mix(in srgb, var(--csb-primary) 38%, var(--csb-border));
+}
+/* Punched notches sitting on the perforation line (clipped by overflow:hidden */
+/* so only the inward half-circle shows — reads as a torn ticket edge).        */
+.csb-cards--ticket .csb-card__footer::before,
+.csb-cards--ticket .csb-card__footer::after {
+  content: ""; position: absolute; top: -11px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--csb-bg); border: 1px solid var(--csb-border);
+}
+.csb-cards--ticket .csb-card__footer::before { inset-inline-start: -11px; }
+.csb-cards--ticket .csb-card__footer::after  { inset-inline-end: -11px; }
+
+/* Confident price on the stub */
+.csb-cards--ticket .csb-card__price {
+  font-size: 1.28rem;
+  font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;
+}
+/* CTA: solid, lightly rounded like a tear-off tab */
+.csb-cards--ticket .csb-btn--primary {
+  border-radius: var(--csb-radius);
+  padding: 9px 20px;
+}
+/* Category: dashed "stamp" outline to match the ticket motif */
+.csb-cards--ticket .csb-card__cat {
+  align-self: flex-start; display: inline-block;
+  padding: 2px 9px; border-radius: var(--csb-radius-sm);
+  border: 1px dashed color-mix(in srgb, var(--csb-primary) 45%, var(--csb-border));
+  color: var(--csb-primary); text-transform: none;
+  font-size: .68rem; font-weight: 800; letter-spacing: .02em;
+}
+
+/* Archive pagination styling lives in section 21 (.woocommerce-pagination),   */
+/* which the archive templates now emit via paginate_links( type => 'list' ).  */
 
 /* ── Breadcrumb ────────────────────────────────────────────────────────── */
 .csb-breadcrumb {
@@ -2297,6 +2398,9 @@
 @media (max-width: 1024px) {
   .csb-cards[data-cols="4"] { --cols: 3; }
   .csb-archive__layout[data-sidebar] { grid-template-columns: 1fr; }
+  /* Drop explicit column placement so both stack in the single column */
+  .csb-archive__layout[data-sidebar] .csb-archive__sidebar,
+  .csb-archive__layout[data-sidebar] .csb-archive__main { grid-column: auto; }
   .csb-archive__sidebar { position: static; }
 }
 
@@ -2354,4 +2458,7 @@
   /* Overlay footer always visible when motion off */
   .csb-cards--overlay .csb-card__footer { opacity: 1; transform: translateY(0); }
   .csb-cards--overlay .csb-card__body  { padding-bottom: 68px; }
+
+  /* Stop the scarcity pulse */
+  .csb-card__seats--low::before { animation: none !important; }
 }

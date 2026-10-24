@@ -27,7 +27,7 @@ $archive_width   = in_array( $s['archive_width'], [ 'boxed', 'full' ], true ) ? 
 $archive_sidebar = in_array( $s['archive_sidebar'], [ 'none', 'right', 'left' ], true ) ? $s['archive_sidebar'] : 'none';
 $archive_layout  = in_array( $s['archive_layout'], [ 'grid', 'list' ], true ) ? $s['archive_layout'] : 'grid';
 $archive_columns = in_array( (int) $s['archive_columns'], [ 2, 3, 4 ], true ) ? (int) $s['archive_columns'] : 3;
-$card_style      = in_array( $s['card_style'], [ 'classic', 'overlay', 'minimal', 'horizontal' ], true ) ? $s['card_style'] : 'classic';
+$card_style      = in_array( $s['card_style'], [ 'classic', 'editorial', 'ticket', 'overlay', 'minimal', 'horizontal' ], true ) ? $s['card_style'] : 'classic';
 $show_filters    = ! empty( $s['show_filters'] );
 $show_count      = ! empty( $s['show_result_count'] );
 $card_cta_label  = esc_html( sanitize_text_field( $s['card_cta_label'] ?: __( 'مشاهده و ثبت‌نام', 'csb' ) ) );
@@ -264,13 +264,13 @@ $archive_base_url = trailingslashit( home_url( '/' . $_csb_video_base ) );
 
 						<?php if ( ! empty( $s['card_show_price'] ) ) : ?>
 						<div class="csb-card__price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-							<?php if ( $earlybird_active && ! empty( $s['card_show_earlybird'] ) ) : ?>
-								<del class="csb-card__price-regular">
-									<?php echo wp_kses_post( wc_price( $regular_price ) ); ?>
-								</del>
-								<ins class="csb-card__price-earlybird">
-									<?php echo wp_kses_post( wc_price( $earlybird_price ) ); ?>
-								</ins>
+							<?php if ( $earlybird_active && ! empty( $s['card_show_earlybird'] ) ) :
+								$disc_pct = $regular_price > 0 ? (int) round( ( 1 - $earlybird_price / $regular_price ) * 100 ) : 0; ?>
+								<del class="csb-card__price-regular"><?php echo wp_kses_post( wc_price( $regular_price ) ); ?></del>
+								<ins class="csb-card__price-earlybird"><?php echo wp_kses_post( wc_price( $earlybird_price ) ); ?></ins>
+								<?php if ( $disc_pct > 0 ) : ?>
+									<span class="csb-card__discount"><?php printf( esc_html__( '٪%s تخفیف', 'csb' ), esc_html( (string) $disc_pct ) ); ?></span>
+								<?php endif; ?>
 							<?php else : ?>
 								<?php echo wp_kses_post( $product->get_price_html() ); ?>
 							<?php endif; ?>
@@ -290,10 +290,29 @@ $archive_base_url = trailingslashit( home_url( '/' . $_csb_video_base ) );
 
 			</div><!-- .csb-cards -->
 
-			<?php the_posts_pagination( [
-				'prev_text' => esc_html__( '&laquo; قبلی', 'csb' ),
-				'next_text' => esc_html__( 'بعدی &raquo;', 'csb' ),
-			] ); ?>
+			<?php
+			$csb_total_pages = (int) $GLOBALS['wp_query']->max_num_pages;
+			if ( $csb_total_pages > 1 ) :
+				$csb_links = paginate_links( [
+					'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999, false ) ) ),
+					'format'    => '',
+					'current'   => max( 1, (int) get_query_var( 'paged' ) ),
+					'total'     => $csb_total_pages,
+					'type'      => 'list',
+					'end_size'  => 1,
+					'mid_size'  => 1,
+					'prev_text' => esc_html__( '« قبلی', 'csb' ),
+					'next_text' => esc_html__( 'بعدی »', 'csb' ),
+				] );
+				if ( $csb_links ) {
+					printf(
+						'<nav class="woocommerce-pagination" aria-label="%s">%s</nav>',
+						esc_attr__( 'صفحه‌بندی', 'csb' ),
+						$csb_links // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- paginate_links output; base URL escaped above
+					);
+				}
+			endif;
+			?>
 
 			<?php else : ?>
 			<p class="csb-no-results"><?php esc_html_e( 'ویدیوکلاسی یافت نشد.', 'csb' ); ?></p>

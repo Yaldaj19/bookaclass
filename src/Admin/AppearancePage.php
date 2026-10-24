@@ -301,7 +301,7 @@ class AppearancePage {
 			: $d['font_family'];
 
 		// ── Select: card_style ────────────────────────────────────────────────
-		$allowed_card_styles = [ 'classic', 'overlay', 'minimal', 'horizontal' ];
+		$allowed_card_styles = [ 'classic', 'editorial', 'ticket', 'overlay', 'minimal', 'horizontal' ];
 		$clean['card_style'] = in_array( $input['card_style'] ?? '', $allowed_card_styles, true )
 			? $input['card_style']
 			: $d['card_style'];
@@ -564,10 +564,12 @@ class AppearancePage {
 									id="csb_ap_card_style"
 									name="<?php echo esc_attr( self::OPTION_KEY ); ?>[card_style]"
 								>
-									<option value="classic"    <?php selected( $style['card_style'], 'classic' ); ?>><?php esc_html_e( 'کلاسیک', 'csb' ); ?></option>
-									<option value="overlay"    <?php selected( $style['card_style'], 'overlay' ); ?>><?php esc_html_e( 'Overlay (متن روی تصویر)', 'csb' ); ?></option>
-									<option value="minimal"    <?php selected( $style['card_style'], 'minimal' ); ?>><?php esc_html_e( 'مینیمال', 'csb' ); ?></option>
-									<option value="horizontal" <?php selected( $style['card_style'], 'horizontal' ); ?>><?php esc_html_e( 'افقی', 'csb' ); ?></option>
+									<option value="classic"    <?php selected( $style['card_style'], 'classic' ); ?>><?php esc_html_e( '۱ — کلاسیک', 'csb' ); ?></option>
+									<option value="editorial"  <?php selected( $style['card_style'], 'editorial' ); ?>><?php esc_html_e( '۲ — زعفرانی مجله‌ای', 'csb' ); ?></option>
+									<option value="ticket"     <?php selected( $style['card_style'], 'ticket' ); ?>><?php esc_html_e( '۳ — بلیت', 'csb' ); ?></option>
+									<option value="overlay"    <?php selected( $style['card_style'], 'overlay' ); ?>><?php esc_html_e( '۴ — Overlay (متن روی تصویر)', 'csb' ); ?></option>
+									<option value="minimal"    <?php selected( $style['card_style'], 'minimal' ); ?>><?php esc_html_e( '۵ — مینیمال', 'csb' ); ?></option>
+									<option value="horizontal" <?php selected( $style['card_style'], 'horizontal' ); ?>><?php esc_html_e( '۶ — افقی', 'csb' ); ?></option>
 								</select>
 							</td>
 						</tr>
