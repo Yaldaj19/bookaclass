@@ -63,6 +63,8 @@ if ( $current_uid ) {
 $stream_base   = esc_url( rest_url( 'csb/v1/video/' . $post_id . '/' ) );
 $progress_url  = esc_url( rest_url( 'csb/v1/enrollment/' . $post_id . '/progress' ) );
 $rest_nonce    = wp_create_nonce( 'wp_rest' );
+$_rating_count = (int) $product->get_rating_count();
+$_avg_rating   = (float) $product->get_average_rating();
 ?>
 
 <?php
@@ -110,7 +112,19 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 				<?php endif; ?>
 			</div>
 			<div class="csb-hero__body">
+				<div class="csb-hero__tags">
+					<?php if ( '' !== $_hero_cat ) : ?>
+						<span class="csb-hero__cat"><?php echo esc_html( $_hero_cat ); ?></span>
+					<?php endif; ?>
+					<span class="csb-hero__type csb-hero__type--video"><?php esc_html_e( 'ویدیو کلاس', 'csb' ); ?></span>
+				</div>
 				<h1 class="csb-hero__title" itemprop="name"><?php echo esc_html( $title ); ?></h1>
+				<?php if ( $_rating_count > 0 ) : ?>
+					<div class="csb-hero__rating" aria-label="<?php echo esc_attr( sprintf( __( '%1$.1f از ۵ — %2$d نظر', 'csb' ), $_avg_rating, $_rating_count ) ); ?>">
+						<?php echo wp_kses_post( wc_get_rating_html( $_avg_rating, $_rating_count ) ); ?>
+						<span class="csb-hero__rating-count">(<?php echo esc_html( (string) $_rating_count ); ?>)</span>
+					</div>
+				<?php endif; ?>
 				<ul class="csb-meta-list" role="list">
 					<?php if ( $instructor_name ) : ?>
 						<li class="csb-meta-list__item"><?php esc_html_e( 'مدرس:', 'csb' ); ?> <strong><?php echo esc_html( $instructor_name ); ?></strong></li>

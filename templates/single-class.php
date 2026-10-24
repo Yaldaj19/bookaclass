@@ -42,6 +42,9 @@ $syllabus  = $product->get_csb_syllabus();
 
 // Upcoming sessions for this class, including live locked-seat counts.
 $sessions = \BookaClass\Services\CapacityService::get_upcoming_sessions( $post_id );
+$_type_slug    = 'online' === $product->get_csb_class_type() ? 'online' : 'in_person';
+$_rating_count = (int) $product->get_rating_count();
+$_avg_rating   = (float) $product->get_average_rating();
 ?>
 
 <?php
@@ -89,18 +92,34 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 				<?php endif; ?>
 			</div>
 			<div class="csb-hero__body">
+				<div class="csb-hero__tags">
+					<?php if ( '' !== $_hero_cat ) : ?>
+						<span class="csb-hero__cat"><?php echo esc_html( $_hero_cat ); ?></span>
+					<?php endif; ?>
+					<span class="csb-hero__type csb-hero__type--<?php echo esc_attr( $_type_slug ); ?>"><?php echo esc_html( $class_type_label ); ?></span>
+				</div>
 				<h1 class="csb-hero__title" itemprop="name"><?php echo esc_html( $title ); ?></h1>
+				<?php if ( $_rating_count > 0 ) : ?>
+					<div class="csb-hero__rating" aria-label="<?php echo esc_attr( sprintf( __( '%1$.1f از ۵ — %2$d نظر', 'csb' ), $_avg_rating, $_rating_count ) ); ?>">
+						<?php echo wp_kses_post( wc_get_rating_html( $_avg_rating, $_rating_count ) ); ?>
+						<span class="csb-hero__rating-count">(<?php echo esc_html( (string) $_rating_count ); ?>)</span>
+					</div>
+				<?php endif; ?>
 				<ul class="csb-meta-list" role="list">
 					<?php if ( $instructor_name ) : ?>
 						<li class="csb-meta-list__item"><?php esc_html_e( 'مدرس:', 'csb' ); ?> <strong><?php echo esc_html( $instructor_name ); ?></strong></li>
 					<?php endif; ?>
-					<li class="csb-meta-list__item"><?php echo esc_html( $class_type_label ); ?></li>
 					<?php if ( $level ) : ?>
 						<li class="csb-meta-list__item"><?php esc_html_e( 'سطح:', 'csb' ); ?> <?php echo esc_html( $level ); ?></li>
 					<?php endif; ?>
 				</ul>
-				<div class="csb-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-					<?php echo wp_kses_post( $product->get_price_html() ); ?>
+				<div class="csb-hero__price-row">
+					<div class="csb-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+						<?php echo wp_kses_post( $product->get_price_html() ); ?>
+					</div>
+					<a class="csb-btn csb-btn--primary csb-hero__cta" href="#csb-sessions-hdg">
+						<?php esc_html_e( 'مشاهده جلسات و ثبت‌نام', 'csb' ); ?>
+					</a>
 				</div>
 			</div>
 		</header>
@@ -177,12 +196,12 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 									<input type="hidden" name="csb_session_id" value="<?php echo esc_attr( (string) $session_id ); ?>" />
 
 									<!-- Payment mode: deposit or full -->
-									<fieldset class="csb-payment-mode" style="border:none;padding:0;margin:.5em 0;">
-										<legend class="csb-payment-mode__legend" style="font-weight:bold;margin-bottom:.4em;">
+									<fieldset class="csb-payment-mode">
+										<legend class="csb-payment-mode__legend">
 											<?php esc_html_e( 'روش پرداخت', 'csb' ); ?>
 										</legend>
 
-										<label class="csb-payment-mode__option" style="display:block;margin:.25em 0;">
+										<label class="csb-payment-mode__option">
 											<input type="radio" name="csb_payment_mode" value="full"
 												<?php checked( true ); // default ?>
 												aria-describedby="csb-full-desc-<?php echo esc_attr( (string) $session_id ); ?>" />
@@ -194,7 +213,7 @@ $_csb_crumb_term  = ( ! is_wp_error( $_csb_crumb_terms ) && ! empty( $_csb_crumb
 										</label>
 
 										<?php if ( $deposit_amount > 0 && $deposit_amount < $full_price ) : ?>
-										<label class="csb-payment-mode__option" style="display:block;margin:.25em 0;">
+										<label class="csb-payment-mode__option">
 											<input type="radio" name="csb_payment_mode" value="deposit"
 												aria-describedby="csb-dep-desc-<?php echo esc_attr( (string) $session_id ); ?>" />
 											<?php esc_html_e( 'پرداخت بیعانه', 'csb' ); ?>
